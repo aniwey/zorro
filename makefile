@@ -1,24 +1,24 @@
 PROG = main
 OBJ_DIR = obj
 SRC_DIR = src
-SRCS = *.cpp
-OBJS = *.o
+SRCS = $(shell find $(SRC_DIR) -name "*.cpp")
+OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++11 -g -lsfml-system -lsfml-window -lsfml-graphics
 
-$(PROG): $(OBJ_DIR)/$(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(PROG) $(OBJ_DIR)/$(OBJS)
+$(PROG): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(PROG) $(OBJS)
 
-.cpp.o:
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 .PHONY: clean
 clean:
-	rm -f $(PROG) $(OBJ_DIR)/$(OBJS)
+	rm -f $(PROG) $(OBJS)
 
 .PHONY: depend
 depend: .depend
-.depend: $(SRC_DIR)/$(SRCS)
+.depend: $(SRCS)
 	rm -f ./src/.depend
 	$(CXX) $(CXXFLAGS) -MM $^>>./src/.depend;
 
