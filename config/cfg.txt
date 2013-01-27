@@ -1,4 +1,0 @@
-language=fr
-resolution_width=1366
-resolution_height=768
-fullscreen=no

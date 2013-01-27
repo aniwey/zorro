@@ -1,4 +1,0 @@
-menu_dirt=Dirt
-menu_air=Air
-menu_stone=Stone
-menu_seed=Bush
