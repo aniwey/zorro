@@ -28,7 +28,7 @@ class Toolbar{
     
     // Functions called when some events occur to notify the toolbar
     void leftButtonPressed(God&, sf::Vector2i);
-    void theoreticalMouseMoved(sf::Vector2i);
+    void mouseMoved(sf::Vector2i);
     
     // Other functions
     bool isCursorUsed(sf::Vector2i); // Return true if the toolbar is currently using the cursor

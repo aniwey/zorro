@@ -25,8 +25,8 @@ void Interface::leftButtonPressed(God& g, sf::Vector2i mousePosition){
   mainToolbar.leftButtonPressed(g, mousePosition);
 }
 
-void Interface::theoreticalMouseMoved(sf::Vector2i mousePosition){
-  mainToolbar.theoreticalMouseMoved(mousePosition);
+void Interface::mouseMoved(sf::Vector2i mousePosition){
+  mainToolbar.mouseMoved(mousePosition);
 }
 
 bool Interface::isCursorUsed(sf::Vector2i mousePosition){

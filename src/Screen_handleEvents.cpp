@@ -29,28 +29,28 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
           case sf::Keyboard::Up:
             moveCursor(sf::Vector2f(0, -4));
             correctCursorPosition();
-            i.theoreticalMouseMoved(getTheoreticalMousePosition());
+            i.mouseMoved(mousePosition);
             createLandCursorPosition();
             correctLandCursorPosition(l);
           break;
           case sf::Keyboard::Down:
             moveCursor(sf::Vector2f(0, 4));
             correctCursorPosition();
-            i.theoreticalMouseMoved(getTheoreticalMousePosition());
+            i.mouseMoved(mousePosition);
             createLandCursorPosition();
             correctLandCursorPosition(l);
           break;
           case sf::Keyboard::Left:
             moveCursor(sf::Vector2f(-4, 0));
             correctCursorPosition();
-            i.theoreticalMouseMoved(getTheoreticalMousePosition());
+            i.mouseMoved(mousePosition);
             createLandCursorPosition();
             correctLandCursorPosition(l);
           break;
           case sf::Keyboard::Right:
             moveCursor(sf::Vector2f(4, 0));
             correctCursorPosition();
-            i.theoreticalMouseMoved(getTheoreticalMousePosition());
+            i.mouseMoved(mousePosition);
             createLandCursorPosition();
             correctLandCursorPosition(l);
           break;
@@ -89,7 +89,7 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
           }
           // Correct cursorPosition and recalculate landCursorPosition
           correctCursorPosition();
-          i.theoreticalMouseMoved(getTheoreticalMousePosition());
+          i.mouseMoved(mousePosition);
           createLandCursorPosition();
           correctLandCursorPosition(l);
           // Calculate relative movement of the land cursor

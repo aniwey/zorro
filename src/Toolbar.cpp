@@ -84,7 +84,7 @@ void Toolbar::leftButtonPressed(God& g, sf::Vector2i mousePosition){
   }
 }
 
-void Toolbar::theoreticalMouseMoved(sf::Vector2i mousePosition){
+void Toolbar::mouseMoved(sf::Vector2i mousePosition){
   if(mousePosition.y <= normalPosition.y){
     retract(true);
   }

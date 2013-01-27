@@ -20,7 +20,7 @@ class Interface{
     
     // Functions called when some events occur to notify the interface
     void leftButtonPressed(God&, sf::Vector2i);
-    void theoreticalMouseMoved(sf::Vector2i);
+    void mouseMoved(sf::Vector2i);
     
     Toolbar mainToolbar;
     
