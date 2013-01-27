@@ -36,7 +36,7 @@ void Screen::init(ConfigData& mainConfig){
     window.create(sf::VideoMode(width, height), "zorro2");
   }
   window.setFramerateLimit(60);
-  //window.setMouseCursorVisible(false);
+  window.setMouseCursorVisible(false);
   
   // Image, sprite and texture
   screenImage.create(imageWidth, imageHeight);
