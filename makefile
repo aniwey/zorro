@@ -17,9 +17,9 @@ clean:
 	rm -f $(PROG) $(OBJS)
 
 .PHONY: depend
-depend: .depend
-.depend: $(SRCS)
-	rm -f ./src/.depend
-	$(CXX) $(CXXFLAGS) -MM $^>>./src/.depend;
+depend: $(SRC_DIR)/.depend
+$(SRC_DIR)/.depend: $(SRCS)
+	rm -f $(SRC_DIR)/.depend
+	$(CXX) $(CXXFLAGS) -MM $^>>$(SRC_DIR)/.depend;
 
-include .depend
+include $(SRC_DIR)/.depend
