@@ -5,22 +5,22 @@ God::God(){
   pixelAddingDiameter = 10;
 }
 
-void God::addThings(Land& l, int x, int y, bool justClicked, int landCursorMovementX, int landCursorMovementY){
+void God::addThings(Land& l, int oldLandCursorX, int oldLandCursorY, int newLandCursorX, int newLandCursorY, bool activeAddingEvent){
   int diameter = getAddingDiameterDependingOnPixelTypeSelected();
   
   // If the pixel type selected can be added massively
   if(pixelTypeSelected != pixelType_SEED){
-    // If the mouse didn't move this loop
-    if(landCursorMovementX == 0 && landCursorMovementY == 0)
-      l.writePixelRectangle(x - diameter/2, y - diameter/2, diameter, diameter, pixelTypeSelected);
-    // Else, the mouse moved this loop
+    // If the land cursor didn't move this loop
+    if(oldLandCursorX == newLandCursorX && oldLandCursorY == newLandCursorY)
+      l.writePixelRectangle(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, diameter, diameter, pixelTypeSelected);
+    // Else, the land cursor moved this loop
     else{
-      l.writeEverythingBetweenTwoOrientedIdenticalRectangles(x - diameter/2, y - diameter/2, (x-landCursorMovementX) - diameter/2, (y-landCursorMovementY) - diameter/2, diameter, pixelTypeSelected);
+      l.writeEverythingBetweenTwoOrientedIdenticalRectangles(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, newLandCursorX - diameter/2, newLandCursorY - diameter/2, diameter, pixelTypeSelected);
     }
   }
-  // Else, it can't be added massively, but it can if we just clicked
-  else if(justClicked){
-    l.writeSinglePixel(x, y, pixelTypeSelected);
+  // Else, it can't be added massively, but it can if we just did an active adding event
+  else if(activeAddingEvent){
+    l.writeSinglePixel(oldLandCursorX, oldLandCursorY, pixelTypeSelected);
   }
 }
 

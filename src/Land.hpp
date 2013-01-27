@@ -40,10 +40,6 @@ class Land{
     void writePixelLine(int x1, int y1, int x2, int y2, pixelType type);
     void writeSinglePixel(int x, int y, pixelType type);
     
-    // "get" functions
-    int getWidth(){ return width; }
-    int getHeight(){ return height; }
-    
     // Pixel array
     std::vector<std::vector<Pixel> > p;
     
@@ -64,11 +60,11 @@ class Land{
     
     // Frame id
     int frame_id;
-
-  private:
+    
     // Size of the pixel arrays
     int width, height;
-    
+
+  private:
     // Pixel groups handling
     std::vector<groupGravityStruct> ggs; // Used to handle pixel groups gravity, declared here to avoid allocating of new memory each loop
     bool resolveGroupGravityStructDependencies(int);

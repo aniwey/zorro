@@ -1,8 +1,8 @@
 #include "Screen.hpp"
 
 void Screen::writeLandToImage(Land& l){
-  for(int i = 0; i < l.getWidth(); ++i){
-    for(int j = 0; j < l.getHeight(); ++j){
+  for(int i = 0; i < l.width; ++i){
+    for(int j = 0; j < l.height; ++j){
       screenImage.setPixel(i, j, l.p[i][j].color);
     }
   }

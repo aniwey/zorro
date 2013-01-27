@@ -13,7 +13,7 @@ class God{
     God();
     
     // Functions reacting to various events, called by Screen methods
-    void addThings(Land&, int, int, bool, int = 0, int = 0);
+    void addThings(Land&, int, int, int, int, bool);
     void movedMouseWheel(int);
     void pressedALetter(sf::Keyboard::Key);
     

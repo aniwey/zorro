@@ -10,7 +10,7 @@ $(PROG): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(PROG) $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@$(CXX) -o $@ -c $< ${CXXFLAGS}
+	$(CXX) -o $@ -c $< ${CXXFLAGS}
 
 .PHONY: clean
 clean:

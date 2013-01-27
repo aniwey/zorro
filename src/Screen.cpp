@@ -23,10 +23,6 @@ void Screen::init(ConfigData& mainConfig){
   catch(std::out_of_range& oor){
     std::cerr << "Bad resolution (out of range) : " << oor.what() << std::endl;
   }
-  
-  // Other sizes
-  imageWidth = width/4;
-  imageHeight = height/4;
 
   // Window
   if(mainConfig.getString("fullscreen") == "yes"){ // If fullscreen mode is set to "yes" in the config, we activate fullscreen
@@ -37,17 +33,6 @@ void Screen::init(ConfigData& mainConfig){
   }
   window.setFramerateLimit(60);
   window.setMouseCursorVisible(false);
-  
-  // Image, sprite and texture
-  screenImage.create(imageWidth, imageHeight);
-  screenSprite.scale(4, 4);
-  screenTexture.loadFromImage(screenImage);
-  
-  // Land view
-  view.setCenter(width/2, height/2);
-  view.setSize(width, height);
-  window.setView(view);
-  viewZoom = 1;
   
   // Interface view
   interfaceView.setCenter(width/2, height/2);
@@ -64,6 +49,25 @@ void Screen::init(ConfigData& mainConfig){
   
   // Mouse
   mousePosition = sf::Mouse::getPosition();
+}
+
+void Screen::adaptToLand(Land& l){
+  // Land view
+  viewIdealCenter = sf::Vector2f(l.width*2, l.height*2);
+  view.setCenter(viewIdealCenter);
+  viewIdealSize = sf::Vector2f(l.width*4, l.height*4);
+  view.setSize(width, height);
+  window.setView(view);
+  viewZoom = 1;
+  
+  // Image size
+  imageWidth = l.width;
+  imageHeight = l.height;
+  
+  // Image, sprite and texture
+  screenImage.create(imageWidth, imageHeight);
+  screenSprite.scale(4, 4);
+  screenTexture.loadFromImage(screenImage);
 }
 
 void Screen::changeZoom(float new_zoom){
@@ -83,13 +87,27 @@ sf::Vector2i Screen::getTheoreticalMousePosition(){
 }
 
 void Screen::correctViewPosition(){
-  if(viewZoom <= 1){ // If the zoom is normal or < 1, then we need to correct the view. Else, it means that we actually want to go out of the land by unzooming
-    int x = view.getCenter().x - (view.getSize().x/2), y = view.getCenter().y - (view.getSize().y/2); // View coordinates
-    if(x < 0) view.move(-x, 0);
-    if(y < 0) view.move(0, -y);
-    if(x + view.getSize().x > width) view.move(width - x - view.getSize().x, 0);
-    if(y + view.getSize().y > height) view.move(0, height - y - view.getSize().y);
+  // If the view ideal size is larger than the real size on x
+  if(viewIdealSize.x > view.getSize().x){
+    // If the view is too much on the left
+    if(view.getCenter().x - view.getSize().x/2 < viewIdealCenter.x - viewIdealSize.x/2)
+      view.setCenter(view.getSize().x/2, view.getCenter().y);
+    // Too much on the right
+    if(view.getCenter().x + view.getSize().x/2 > viewIdealCenter.x + viewIdealSize.x/2)
+      view.setCenter(viewIdealSize.x - view.getSize().x/2, view.getCenter().y);
   }
+  else view.setCenter(viewIdealCenter.x, view.getCenter().y);
+  
+  // If the view ideal size is larger than the real size on y
+  if(viewIdealSize.y > view.getSize().y){
+    // If the view is too much on the top
+    if(view.getCenter().y - view.getSize().y/2 < viewIdealCenter.y - viewIdealSize.y/2)
+      view.setCenter(view.getCenter().x, view.getSize().y/2);
+    // Too much on the bottom
+    if(view.getCenter().y + view.getSize().y/2 > viewIdealCenter.y + viewIdealSize.y/2)
+      view.setCenter(view.getCenter().x, viewIdealSize.y - view.getSize().y/2);
+  }
+  else view.setCenter(view.getCenter().x, viewIdealCenter.y);
 }
 
 void Screen::moveCursor(sf::Vector2f move, bool doNotTakeCursorLockingInAccount){
@@ -134,8 +152,13 @@ sf::Vector2f Screen::getCorrectCursorPositionFromThisPosition(sf::Vector2f pos){
   return pos;
 }
 
-void Screen::correctCursorPosition(){
-  cursorPosition = getCorrectCursorPositionFromThisPosition(cursorPosition);
+bool Screen::correctCursorPosition(){
+  sf::Vector2f pos = getCorrectCursorPositionFromThisPosition(cursorPosition);
+  if(pos != cursorPosition){
+    cursorPosition = pos;
+    return true;
+  }
+  return false;
 }
 
 sf::Vector2i Screen::getLandCursorPositionFromThisPosition(sf::Vector2f pos){
@@ -151,8 +174,8 @@ void Screen::createLandCursorPosition(){
 void Screen::correctLandCursorPosition(Land& l){
   if(landCursorPosition.x < 0) landCursorPosition.x = 0;
   if(landCursorPosition.y < 0) landCursorPosition.y = 0;
-  if(landCursorPosition.x > l.getWidth()-1) landCursorPosition.x = l.getWidth()-1;
-  if(landCursorPosition.y > l.getHeight()-1) landCursorPosition.y = l.getHeight()-1;
+  if(landCursorPosition.x > l.width-1) landCursorPosition.x = l.width-1;
+  if(landCursorPosition.y > l.height-1) landCursorPosition.y = l.height-1;
 }
 
 void Screen::useInterfaceView(){

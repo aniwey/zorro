@@ -22,8 +22,8 @@ Land::Land(){
 
 void Land::init(int x, int y){
   // Set land's  width and height
-  width = x/4;
-  height = y/4;
+  width = x;
+  height = y;
   
   // Memory allocation of the pixel array
   try{

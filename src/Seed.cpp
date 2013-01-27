@@ -10,7 +10,7 @@ Seed::Seed(Land& l, int x, int y): Entity(l.frame_id){
       step = seedStep_PLANTED;
     }
     // Else, if we're already landing on a solid pixel
-    else if((y < l.getHeight()-1 && l.pixelPhysicalStateVector[l.p[x][y+1].type] == pixelPhysicalState_SOLID) || y == l.getHeight()-1){
+    else if((y < l.height-1 && l.pixelPhysicalStateVector[l.p[x][y+1].type] == pixelPhysicalState_SOLID) || y == l.height-1){
       step = seedStep_LANDING;
     }
     // Else, we're just falling
@@ -43,14 +43,14 @@ bool Seed::loop(Land& l, int x, int y){
   switch(step){
     case seedStep_FALLING:
       // If there's no more air under us, we move to the next step
-      if((y < l.getHeight()-1 && l.p[x][y+1].type != pixelType_AIR) || y == l.getHeight()-1){
+      if((y < l.height-1 && l.p[x][y+1].type != pixelType_AIR) || y == l.height-1){
         step = seedStep_LANDING; // We move to the next step
         time = 0; // And we reset the time
       }
     break;
     case seedStep_LANDING:
       // If there's dirt under us, we go into the dirt and we move to the next step
-      if(y < l.getHeight()-1 && l.p[x][y+1].type == pixelType_DIRT){
+      if(y < l.height-1 && l.p[x][y+1].type == pixelType_DIRT){
         l.p[x][y+1].create(pixelType_AIR, l, x, y+1); // We make space above in order to go there
         swap(l.p[x][y], l.p[x][y+1]); // We move to the down
         step = seedStep_PLANTED; // We move to the next step

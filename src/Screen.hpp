@@ -21,7 +21,8 @@ typedef enum{
   cursorLockedState_NOT_LOCKED,
   cursorLockedState_LOCKED_BUT_WE_DONT_KNOW_HOW,
   cursorLockedState_LOCKED_HORIZONTALLY,
-  cursorLockedState_LOCKED_VERTICALLY
+  cursorLockedState_LOCKED_VERTICALLY,
+  cursorLockedState_LOCKED_BY_RIGHT_CLICKING
 }cursorLockedStateEnum;
 
 class Screen{
@@ -45,6 +46,9 @@ class Screen{
     // Image manager
     ImageManager im;
     
+    // Functions
+    void adaptToLand(Land&);
+    
   private:
     // Window
     int width, height;
@@ -67,6 +71,7 @@ class Screen{
     void changeZoom(float);
     void correctViewPosition(); // Possibly correct view position to avoid the view being outside of the land
     void useNormalView();
+    sf::Vector2f viewIdealCenter, viewIdealSize;
     
     // Interface view
     sf::View interfaceView;
@@ -90,7 +95,7 @@ class Screen{
     sf::Vector2f cursorPosition; // Precise cursor position
     void moveCursor(sf::Vector2f, bool = false);
     sf::Vector2f getCorrectCursorPositionFromThisPosition(sf::Vector2f);
-    void correctCursorPosition();
+    bool correctCursorPosition(); // Return true if it was corrected
     
     sf::Vector2i landCursorPosition; // Position of the cursor as it will modify land pixels
     sf::Vector2i getLandCursorPositionFromThisPosition(sf::Vector2f);

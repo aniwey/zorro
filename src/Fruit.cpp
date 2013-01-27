@@ -67,7 +67,7 @@ bool Fruit::loop(Land& l, int x, int y){
     break;
     case fruitStep_FALLING_INSIDE_LEAVES: // If the fruit is falling inside leaves
       // If the pixel below is gaseous
-      if(y < l.getHeight()-1 && l.pixelPhysicalStateVector[l.p[x][y+1].type] == pixelPhysicalState_GASEOUS){
+      if(y < l.height-1 && l.pixelPhysicalStateVector[l.p[x][y+1].type] == pixelPhysicalState_GASEOUS){
         swap(l.p[x][y], pixelUnderUs); std::swap(l.p[x][y].group, pixelUnderUs.group);
         l.p[x][y+1] = pixelUnderUs; pixelUnderUs.entity = 0;
         l.p[x][y+1].group = 0;
@@ -75,7 +75,7 @@ bool Fruit::loop(Land& l, int x, int y){
         if(dyingStep == fruitDyingStep_NOTHING) dyingStep = fruitDyingStep_LANDING_COULD_BEGIN_DYING; // We try to be landing, which can be changed by the isGoingToFall callback
       }
       // Else, if the pixel below is LEAVES
-      else if(y < l.getHeight()-1 && l.p[x][y+1].type == pixelType_LEAVES){
+      else if(y < l.height-1 && l.p[x][y+1].type == pixelType_LEAVES){
         swap(l.p[x][y], pixelUnderUs); std::swap(l.p[x][y].group, pixelUnderUs.group);
         swap(pixelUnderUs, l.p[x][y+1]); std::swap(pixelUnderUs.group, l.p[x][y+1].group);
       }
