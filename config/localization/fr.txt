@@ -1,0 +1,4 @@
+menu_dirt=Terre
+menu_air=Air
+menu_stone=Pierre
+menu_seed=Buisson

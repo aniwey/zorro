@@ -1,0 +1,8 @@
+l.width = 1366;
+l.height = 768;
+
+Boucle sur tous les pixels de land         168
+  + condition sur le type/le groupe        558
+  + condition pour tester le physicalState 760
+  + condition sur le type/le groupe X4     920
+
