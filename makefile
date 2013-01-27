@@ -1,5 +1,5 @@
 PROG = main
-SRCS = *.cpp
+SRCS = ./src/*.cpp
 OBJS = $(subst .cpp,.o,$(SRCS))
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++11 -g -lsfml-system -lsfml-window -lsfml-graphics
@@ -17,7 +17,7 @@ clean:
 .PHONY: depend
 depend: .depend
 .depend: $(SRCS)
-	rm -f ./.depend
-	$(CXX) $(CXXFLAGS) -MM $^>>./.depend;
+	rm -f ./src/.depend
+	$(CXX) $(CXXFLAGS) -MM $^>>./src/.depend;
 
 include .depend
