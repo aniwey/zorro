@@ -75,7 +75,7 @@ class Land{
     
     // Loop steps
     void loopDirt();
-    void loopGroups();
+    void loopGravity();
     void loopGroupsSplitting();
     void loopEntities();
 };

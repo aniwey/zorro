@@ -74,7 +74,7 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
         // If the mouse isn't in the center
         if(mouseMovementX != 0 || mouseMovementY != 0){
           // Store the old land cursor position
-            sf::Vector2f oldLandCursorPosition(landCursorPosition);
+          sf::Vector2f oldLandCursorPosition(landCursorPosition);
           // If we're pressing the right button
           if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
             // Move the view relatively to the mouse movement

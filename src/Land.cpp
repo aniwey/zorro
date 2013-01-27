@@ -41,6 +41,7 @@ void Land::init(int x, int y){
   
   // At first, pixel groups will be positive (but it doesn't matter anyway, it change each frame)
   pixelGroupsArePositive = true;
+  lastPixelGroupGiven = 0;
 }
 
 void Land::switchPixelGroupsSign(){

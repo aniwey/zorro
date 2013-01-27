@@ -49,6 +49,8 @@ Screen_draw.o: src/Screen_draw.cpp src/Screen.hpp src/ConfigData.hpp \
  src/random.hpp src/ImageManager.hpp src/Interface.hpp src/Toolbar.hpp \
  src/algo.hpp src/ToolbarButton.hpp
 color.o: src/color.cpp src/color.hpp src/algo.hpp
+Land_loopGravity.o: src/Land_loopGravity.cpp src/Land.hpp src/Pixel.hpp \
+ src/Entity.hpp src/pixelType.hpp src/random.hpp
 Land.o: src/Land.cpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
  src/pixelType.hpp src/random.hpp
 random.o: src/random.cpp src/random.hpp
