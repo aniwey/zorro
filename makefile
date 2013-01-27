@@ -9,8 +9,8 @@ CXXFLAGS = -Wall -Wextra -std=c++11 -g -lsfml-system -lsfml-window -lsfml-graphi
 $(PROG): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(PROG) $(OBJS)
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@$(CXX) -o $@ -c $< ${CXXFLAGS}
 
 .PHONY: clean
 clean:
