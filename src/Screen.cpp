@@ -60,8 +60,9 @@ void Screen::adaptToLand(Land& l){
   
   // Image, sprite and texture
   screenImage.create(imageWidth, imageHeight);
-  screenSprite.scale(4, 4);
+  screenSprite.setScale(4, 4);
   screenTexture.loadFromImage(screenImage);
+  screenSprite.setTexture(screenTexture);
   
   // Cursor
   cursorPosition = getMouseCursorPosition();

@@ -1,8 +1,10 @@
+#include "Land.hpp"
+
 #include "Fruit.hpp"
 
 Fruit::Fruit(Land& l, int x, int y): Entity(l.frame_id){
-  // Get the pixel that's under us
-  pixelUnderUs = l.p[x][y];
+  // Get color of the pixel that's under us
+  leavesColorUnderUs = l.p[x][y].color;
   
   // Set type
   l.p[x][y].type = pixelType_FRUIT;
@@ -68,16 +70,20 @@ bool Fruit::loop(Land& l, int x, int y){
     case fruitStep_FALLING_INSIDE_LEAVES: // If the fruit is falling inside leaves
       // If the pixel below is gaseous
       if(y < l.height-1 && l.pixelPhysicalStateVector[l.p[x][y+1].type] == pixelPhysicalState_GASEOUS){
-        swap(l.p[x][y], pixelUnderUs); std::swap(l.p[x][y].group, pixelUnderUs.group);
-        l.p[x][y+1] = pixelUnderUs; pixelUnderUs.entity = 0;
-        l.p[x][y+1].group = 0;
+        l.p[x][y+1] = l.p[x][y]; // We go down
+        l.p[x][y].type = pixelType_LEAVES; l.p[x][y].entity = 0; l.p[x][y].color = leavesColorUnderUs; // We set the leaves pixel under us
+        l.p[x][y+1].group = 0; // We have no group now
         step = fruitStep_JUST_FALLING; // We're just falling now, since we're out of the tree
         if(dyingStep == fruitDyingStep_NOTHING) dyingStep = fruitDyingStep_LANDING_COULD_BEGIN_DYING; // We try to be landing, which can be changed by the isGoingToFall callback
       }
       // Else, if the pixel below is LEAVES
       else if(y < l.height-1 && l.p[x][y+1].type == pixelType_LEAVES){
-        swap(l.p[x][y], pixelUnderUs); std::swap(l.p[x][y].group, pixelUnderUs.group);
-        swap(pixelUnderUs, l.p[x][y+1]); std::swap(pixelUnderUs.group, l.p[x][y+1].group);
+        int group = l.p[x][y+1].group; // We save the group of the leaves pixel where we are going
+        sf::Color color = l.p[x][y+1].color; // We save the color of the leaves pixel where we are going
+        l.p[x][y+1] = l.p[x][y]; // We go down
+        l.p[x][y+1].group = group; // We take the group of the leaves pixel where we are
+        l.p[x][y].type = pixelType_LEAVES; l.p[x][y].entity = 0; l.p[x][y].color = leavesColorUnderUs; // We set the leaves pixel under us
+        leavesColorUnderUs = color;
       }
       // Else, we didn't felt inside leaves or out of leaves, that means we're lading, we try to be landing, which can be changed by the isGoingToFall callback
       else{

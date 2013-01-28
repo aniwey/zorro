@@ -1,9 +1,12 @@
 #ifndef HPP_FRUIT
 #define HPP_FRUIT
 
+#include <boost/serialization/base_object.hpp>
+
+#include <SFML/Graphics/Color.hpp>
+
 #include "color.hpp"
 #include "Entity.hpp"
-#include "Land.hpp"
 
 typedef enum{
   fruitStep_RIPENING,
@@ -19,6 +22,7 @@ typedef enum{
 
 class Fruit:public Entity{
   public:
+    Fruit(){};
     Fruit(Land&, int, int);
     ~Fruit();
     
@@ -26,11 +30,23 @@ class Fruit:public Entity{
     void isGoingToFall();
     
   private:
+    // Serialization
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int){
+      boost::serialization::base_object<Entity>(*this);
+      ar & step;
+      ar & time;
+      ar & dyingStep;
+      ar & dyingTime;
+      ar & leavesColorUnderUs;
+    }
+  
     fruitStep step;
     int time;
     fruitDyingStep dyingStep;
     int dyingTime;
-    Pixel pixelUnderUs;
+    sf::Color leavesColorUnderUs;
 };
 
 #endif

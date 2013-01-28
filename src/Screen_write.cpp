@@ -10,7 +10,6 @@ void Screen::writeLandToImage(Land& l){
 
 void Screen::writeImageToTexture(){
   screenTexture.update(screenImage);
-  screenSprite.setTexture(screenTexture);
 }
 
 void Screen::writeTextureToWindow(){

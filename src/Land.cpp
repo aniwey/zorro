@@ -35,6 +35,10 @@ void Land::init(int x, int y){
   catch(std::bad_alloc const&){
     std::cerr << "Memory allocation fail!" << std::endl;
   }
+}
+
+void Land::newGame(int x, int y){
+  init(x, y);
   
   // We fill the land with air
   writePixelRectangle(0, 0, width, height, pixelType_AIR);
@@ -42,6 +46,7 @@ void Land::init(int x, int y){
   // At first, pixel groups will be positive (but it doesn't matter anyway, it change each frame)
   pixelGroupsArePositive = true;
   lastPixelGroupGiven = 0;
+  frame_id = 0;
 }
 
 void Land::switchPixelGroupsSign(){

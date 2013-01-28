@@ -1,3 +1,5 @@
+#include "Land.hpp"
+
 #include "Seed.hpp"
 
 Seed::Seed(Land& l, int x, int y): Entity(l.frame_id){

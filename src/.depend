@@ -1,62 +1,86 @@
 ImageManager.o: src/ImageManager.cpp src/ImageManager.hpp
-Pixel.o: src/Pixel.cpp src/Pixel.hpp src/Entity.hpp src/pixelType.hpp \
- src/random.hpp src/Fruit.hpp src/color.hpp src/algo.hpp src/Land.hpp \
- src/Seed.hpp
-Seed.o: src/Seed.cpp src/Seed.hpp src/Entity.hpp src/Land.hpp \
- src/Pixel.hpp src/pixelType.hpp src/random.hpp
+Pixel.o: src/Pixel.cpp src/Pixel.hpp src/Entity.hpp src/Fruit.hpp \
+ src/color.hpp src/algo.hpp src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp
+Seed.o: src/Seed.cpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
+ src/Fruit.hpp src/color.hpp src/algo.hpp src/pixelType.hpp \
+ src/random.hpp src/Seed.hpp src/SFML_serialization_functions.hpp
 Land_write.o: src/Land_write.cpp src/Land.hpp src/Pixel.hpp \
- src/Entity.hpp src/pixelType.hpp src/random.hpp
+ src/Entity.hpp src/Fruit.hpp src/color.hpp src/algo.hpp \
+ src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp
 Land_loopEntities.o: src/Land_loopEntities.cpp src/Land.hpp src/Pixel.hpp \
- src/Entity.hpp src/pixelType.hpp src/random.hpp
+ src/Entity.hpp src/Fruit.hpp src/color.hpp src/algo.hpp \
+ src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp
 God.o: src/God.cpp src/God.hpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
- src/pixelType.hpp src/random.hpp
+ src/Fruit.hpp src/color.hpp src/algo.hpp src/pixelType.hpp \
+ src/random.hpp src/Seed.hpp src/SFML_serialization_functions.hpp
 Interface.o: src/Interface.cpp src/Interface.hpp src/ConfigData.hpp \
- src/Land.hpp src/Pixel.hpp src/Entity.hpp src/pixelType.hpp \
- src/random.hpp src/Screen.hpp src/God.hpp src/ImageManager.hpp \
- src/Toolbar.hpp src/algo.hpp src/ToolbarButton.hpp
+ src/Land.hpp src/Pixel.hpp src/Entity.hpp src/Fruit.hpp src/color.hpp \
+ src/algo.hpp src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp src/Screen.hpp src/God.hpp \
+ src/ImageManager.hpp src/Toolbar.hpp src/ToolbarButton.hpp
 main.o: src/main.cpp src/ConfigData.hpp src/God.hpp src/Land.hpp \
- src/Pixel.hpp src/Entity.hpp src/pixelType.hpp src/random.hpp \
- src/Interface.hpp src/Screen.hpp src/ImageManager.hpp src/Toolbar.hpp \
- src/algo.hpp src/ToolbarButton.hpp
+ src/Pixel.hpp src/Entity.hpp src/Fruit.hpp src/color.hpp src/algo.hpp \
+ src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp src/Interface.hpp src/Screen.hpp \
+ src/ImageManager.hpp src/Toolbar.hpp src/ToolbarButton.hpp
 Land_loopDirt.o: src/Land_loopDirt.cpp src/Land.hpp src/Pixel.hpp \
- src/Entity.hpp src/pixelType.hpp src/random.hpp
+ src/Entity.hpp src/Fruit.hpp src/color.hpp src/algo.hpp \
+ src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp
 ToolbarButton.o: src/ToolbarButton.cpp src/ToolbarButton.hpp \
  src/ConfigData.hpp src/ImageManager.hpp src/pixelType.hpp
 Land_save_and_load.o: src/Land_save_and_load.cpp src/Land.hpp \
- src/Pixel.hpp src/Entity.hpp src/pixelType.hpp src/random.hpp
+ src/Pixel.hpp src/Entity.hpp src/Fruit.hpp src/color.hpp src/algo.hpp \
+ src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp
 Entity.o: src/Entity.cpp src/Entity.hpp
 algo.o: src/algo.cpp src/algo.hpp
 Screen_handleEvents.o: src/Screen_handleEvents.cpp src/Screen.hpp \
  src/ConfigData.hpp src/God.hpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
- src/pixelType.hpp src/random.hpp src/ImageManager.hpp src/Interface.hpp \
- src/Toolbar.hpp src/algo.hpp src/ToolbarButton.hpp
+ src/Fruit.hpp src/color.hpp src/algo.hpp src/pixelType.hpp \
+ src/random.hpp src/Seed.hpp src/SFML_serialization_functions.hpp \
+ src/ImageManager.hpp src/Interface.hpp src/Toolbar.hpp \
+ src/ToolbarButton.hpp
 Toolbar.o: src/Toolbar.cpp src/Toolbar.hpp src/algo.hpp \
  src/ConfigData.hpp src/God.hpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
- src/pixelType.hpp src/random.hpp src/ImageManager.hpp \
+ src/Fruit.hpp src/color.hpp src/pixelType.hpp src/random.hpp \
+ src/Seed.hpp src/SFML_serialization_functions.hpp src/ImageManager.hpp \
  src/ToolbarButton.hpp
 Land_loop.o: src/Land_loop.cpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
- src/pixelType.hpp src/random.hpp
+ src/Fruit.hpp src/color.hpp src/algo.hpp src/pixelType.hpp \
+ src/random.hpp src/Seed.hpp src/SFML_serialization_functions.hpp
 Land_loopGroups.o: src/Land_loopGroups.cpp src/Land.hpp src/Pixel.hpp \
- src/Entity.hpp src/pixelType.hpp src/random.hpp
-Fruit.o: src/Fruit.cpp src/Fruit.hpp src/color.hpp src/algo.hpp \
- src/Entity.hpp src/Land.hpp src/Pixel.hpp src/pixelType.hpp \
- src/random.hpp
+ src/Entity.hpp src/Fruit.hpp src/color.hpp src/algo.hpp \
+ src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp
+Fruit.o: src/Fruit.cpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
+ src/Fruit.hpp src/color.hpp src/algo.hpp src/pixelType.hpp \
+ src/random.hpp src/Seed.hpp src/SFML_serialization_functions.hpp
 Screen_write.o: src/Screen_write.cpp src/Screen.hpp src/ConfigData.hpp \
- src/God.hpp src/Land.hpp src/Pixel.hpp src/Entity.hpp src/pixelType.hpp \
- src/random.hpp src/ImageManager.hpp src/Interface.hpp src/Toolbar.hpp \
- src/algo.hpp src/ToolbarButton.hpp
+ src/God.hpp src/Land.hpp src/Pixel.hpp src/Entity.hpp src/Fruit.hpp \
+ src/color.hpp src/algo.hpp src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp src/ImageManager.hpp \
+ src/Interface.hpp src/Toolbar.hpp src/ToolbarButton.hpp
 ConfigData.o: src/ConfigData.cpp src/ConfigData.hpp
 Screen_draw.o: src/Screen_draw.cpp src/Screen.hpp src/ConfigData.hpp \
- src/God.hpp src/Land.hpp src/Pixel.hpp src/Entity.hpp src/pixelType.hpp \
- src/random.hpp src/ImageManager.hpp src/Interface.hpp src/Toolbar.hpp \
- src/algo.hpp src/ToolbarButton.hpp
+ src/God.hpp src/Land.hpp src/Pixel.hpp src/Entity.hpp src/Fruit.hpp \
+ src/color.hpp src/algo.hpp src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp src/ImageManager.hpp \
+ src/Interface.hpp src/Toolbar.hpp src/ToolbarButton.hpp
 color.o: src/color.cpp src/color.hpp src/algo.hpp
 Land_loopGravity.o: src/Land_loopGravity.cpp src/Land.hpp src/Pixel.hpp \
- src/Entity.hpp src/pixelType.hpp src/random.hpp
+ src/Entity.hpp src/Fruit.hpp src/color.hpp src/algo.hpp \
+ src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp
 Land.o: src/Land.cpp src/Land.hpp src/Pixel.hpp src/Entity.hpp \
- src/pixelType.hpp src/random.hpp
+ src/Fruit.hpp src/color.hpp src/algo.hpp src/pixelType.hpp \
+ src/random.hpp src/Seed.hpp src/SFML_serialization_functions.hpp
 random.o: src/random.cpp src/random.hpp
 Screen.o: src/Screen.cpp src/Screen.hpp src/ConfigData.hpp src/God.hpp \
- src/Land.hpp src/Pixel.hpp src/Entity.hpp src/pixelType.hpp \
- src/random.hpp src/ImageManager.hpp src/Interface.hpp src/Toolbar.hpp \
- src/algo.hpp src/ToolbarButton.hpp
+ src/Land.hpp src/Pixel.hpp src/Entity.hpp src/Fruit.hpp src/color.hpp \
+ src/algo.hpp src/pixelType.hpp src/random.hpp src/Seed.hpp \
+ src/SFML_serialization_functions.hpp src/ImageManager.hpp \
+ src/Interface.hpp src/Toolbar.hpp src/ToolbarButton.hpp

@@ -30,6 +30,7 @@ class Land{
     
     // Initialization
     void init(int, int);
+    void newGame(int, int);
     
     // Loop
     void loop();
@@ -65,8 +66,8 @@ class Land{
     int width, height;
     
     // Serialization
-    void save(std::string);
-    void load(std::string);
+    void saveGame(std::string);
+    void loadGame(std::string);
 
   private:
     // Pixel groups handling

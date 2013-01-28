@@ -1,10 +1,13 @@
 #ifndef HPP_ENTITY
 #define HPP_ENTITY
 
+#include <boost/serialization/access.hpp>
+
 class Land;
 
 class Entity{
   public:
+    Entity();
     Entity(int frame_id);
     virtual ~Entity();
     
@@ -14,6 +17,9 @@ class Entity{
     int last_frame_id; // Contains the identifier of the last frame when the entity looped
     
   private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &, const unsigned int){}
 };
 
 #endif

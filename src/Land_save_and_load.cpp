@@ -1,20 +1,39 @@
 #include <fstream>
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 
 #include "Land.hpp"
 
-void Land::save(std::string filename){
+void Land::saveGame(std::string filename){
   std::ofstream ofs(filename);
-  boost::archive::text_oarchive oa(ofs);
+  boost::archive::binary_oarchive oa(ofs);
   oa << pixelGroupsArePositive;
-  oa << p;
+  oa << lastPixelGroupGiven;
+  oa << width;
+  oa << height;
+  for(int i = 0; i < width; ++i){
+    for(int j = 0; j < height; ++j){
+      oa << p[i][j];
+    }
+  }
 }
 
-void Land::load(std::string filename){
+void Land::loadGame(std::string filename){
+  // Load serialized data
   std::ifstream ifs(filename);
-  boost::archive::text_iarchive ia(ifs);
+  boost::archive::binary_iarchive ia(ifs);
   ia >> pixelGroupsArePositive;
-  ia >> p;
+  ia >> lastPixelGroupGiven;
+  ia >> width;
+  ia >> height;
+  init(width, height); // Init land (resize the vector)
+  for(int i = 0; i < width; ++i){
+    for(int j = 0; j < height; ++j){
+      ia >> p[i][j];
+    }
+  }
+  
+  // Other stuff
+  frame_id = 0;
 }

@@ -3,8 +3,9 @@
 
 #include <cmath>
 
+#include <boost/serialization/base_object.hpp>
+
 #include "Entity.hpp"
-#include "Land.hpp"
 
 class Land;
 
@@ -19,6 +20,7 @@ typedef enum{
 
 class Seed:public Entity{
   public:
+    Seed(){};
     Seed(Land&, int, int);
     ~Seed();
     
@@ -26,6 +28,15 @@ class Seed:public Entity{
     void isGoingToFall();
     
   private:
+    // Serialization
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int){
+      boost::serialization::base_object<Entity>(*this);
+      ar & step;
+      ar & time;
+    }
+  
     // Variables
     seedStep step; // Used to store the step (see the enumeration above)
     int time; // Used to count number of loops we spend on certain steps

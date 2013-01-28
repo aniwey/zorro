@@ -4,11 +4,17 @@
 #include <algorithm>
 #include <iostream>
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/export.hpp>
+
 #include <SFML/Graphics/Color.hpp>
 
 #include "Entity.hpp"
+#include "Fruit.hpp"
 #include "pixelType.hpp"
 #include "random.hpp"
+#include "Seed.hpp"
+#include "SFML_serialization_functions.hpp"
 
 class Pixel{
   public:
@@ -42,11 +48,13 @@ class Pixel{
     // Serialization
     friend class boost::serialization::access;
     template<class Archive>
-    void serialize(Archive& ar, const unsigned int version){
-        ar & type;
-        ar & color;
-        ar & group;
-        ar & entity;
+    void serialize(Archive & ar, const unsigned int){
+      ar.template register_type<Seed>();
+      ar.template register_type<Fruit>();
+      ar & type;
+      ar & color;
+      ar & group;
+      ar & entity;
     }
   
     // Private functions used by create() method
