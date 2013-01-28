@@ -38,12 +38,6 @@ void Screen::init(ConfigData& mainConfig){
   interfaceView.setCenter(width/2, height/2);
   interfaceView.setSize(width, height);
   
-  // Cursor
-  cursorPosition = getMouseCursorPosition();
-  correctCursorPosition();
-  createLandCursorPosition();
-  cursorIsUsedByTheInterface = false;
-  
   // Cursor locking
   cursorLockedState = cursorLockedState_NOT_LOCKED;
   
@@ -68,6 +62,12 @@ void Screen::adaptToLand(Land& l){
   screenImage.create(imageWidth, imageHeight);
   screenSprite.scale(4, 4);
   screenTexture.loadFromImage(screenImage);
+  
+  // Cursor
+  cursorPosition = getMouseCursorPosition();
+  correctCursorPosition();
+  createLandCursorPosition();
+  cursorIsUsedByTheInterface = false;
 }
 
 void Screen::changeZoom(float new_zoom){
@@ -108,6 +108,21 @@ void Screen::correctViewPosition(){
       view.setCenter(view.getCenter().x, viewIdealSize.y - view.getSize().y/2);
   }
   else view.setCenter(view.getCenter().x, viewIdealCenter.y);
+}
+
+bool Screen::isMouseOutOfImage(){
+  sf::Vector2f pos = getMouseCursorPosition();
+  // If the mouse is too much on the left
+  if(pos.x < viewIdealCenter.x - viewIdealSize.x/2)
+    return true;
+  if(pos.x > viewIdealCenter.x + viewIdealSize.x/2)
+    return true;
+  if(pos.y < viewIdealCenter.y - viewIdealSize.y/2)
+    return true;
+  if(pos.y > viewIdealCenter.y + viewIdealSize.y/2)
+    return true;
+    
+  return false;
 }
 
 void Screen::moveCursor(sf::Vector2f move, bool doNotTakeCursorLockingInAccount){

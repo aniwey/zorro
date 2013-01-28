@@ -23,7 +23,7 @@ int main(void){
   
   // Create the land object
   Land l;
-  l.init(s.getWidth()/4 - 200, s.getHeight()/4 - 120);
+  l.init(s.getWidth()/4 - 40, s.getHeight()/4 - 40);
   s.adaptToLand(l);
   
   // Create the interface object

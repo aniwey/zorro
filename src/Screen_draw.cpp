@@ -82,19 +82,29 @@ void Screen::drawCursor(God& g){
     sf::Vertex vertices[] = { sf::Vertex(cursorPosition, sf::Color(0, 0, 0)) };
     window.draw(vertices, 1, sf::Points);
   
-    // Draw the rectangle
+    // Draw the rectangle around the cursor
     sf::RectangleShape rect(sf::Vector2f(size*4 - outline*2, size*4 - outline*2));
     rect.setPosition(landCursorPosition.x*4 - gap + outline, landCursorPosition.y*4 - gap + outline);
     rect.setFillColor(sf::Color(0, 0, 0, 0));
     rect.setOutlineColor(sf::Color(0, 0, 0));
     rect.setOutlineThickness(outline);
     window.draw(rect);
+    
+    // Draw another cursor if the mouse is out of land's image
+    if(isMouseOutOfImage()){
+      sf::Vector2f pos = getMouseCursorPosition();
+      sf::Vertex vertices[] = { sf::Vertex(sf::Vector2f(pos.x - 5*viewZoom, pos.y - 5*viewZoom), sf::Color(255, 255, 255)),
+                              sf::Vertex(sf::Vector2f(pos.x + 5*viewZoom, pos.y + 5*viewZoom), sf::Color(255, 255, 255)),
+                              sf::Vertex(sf::Vector2f(pos.x + 5*viewZoom, pos.y - 5*viewZoom), sf::Color(255, 255, 255)),
+                              sf::Vertex(sf::Vector2f(pos.x - 5*viewZoom, pos.y + 5*viewZoom), sf::Color(255, 255, 255)) };
+      window.draw(vertices, 4, sf::Lines);
+    }
   }
   else{ // Else, we draw the interface cursor
-    sf::Vertex vertices[] = { sf::Vertex(sf::Vector2f(cursorPosition.x - 5, cursorPosition.y - 5), sf::Color(0, 0, 0)),
-                              sf::Vertex(sf::Vector2f(cursorPosition.x + 5, cursorPosition.y + 5), sf::Color(0, 0, 0)),
-                              sf::Vertex(sf::Vector2f(cursorPosition.x + 5, cursorPosition.y - 5), sf::Color(0, 0, 0)),
-                              sf::Vertex(sf::Vector2f(cursorPosition.x - 5, cursorPosition.y + 5), sf::Color(0, 0, 0)) };
+    sf::Vertex vertices[] = { sf::Vertex(sf::Vector2f(cursorPosition.x - 5*viewZoom, cursorPosition.y - 5*viewZoom), sf::Color(0, 0, 0)),
+                              sf::Vertex(sf::Vector2f(cursorPosition.x + 5*viewZoom, cursorPosition.y + 5*viewZoom), sf::Color(0, 0, 0)),
+                              sf::Vertex(sf::Vector2f(cursorPosition.x + 5*viewZoom, cursorPosition.y - 5*viewZoom), sf::Color(0, 0, 0)),
+                              sf::Vertex(sf::Vector2f(cursorPosition.x - 5*viewZoom, cursorPosition.y + 5*viewZoom), sf::Color(0, 0, 0)) };
     window.draw(vertices, 4, sf::Lines);
   }
 }

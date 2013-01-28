@@ -90,6 +90,7 @@ class Screen{
     sf::Vector2f getMouseCursorPosition(); // Get cursor position relatively to the mouse
     sf::Vector2i getTheoreticalMousePosition(); // Get mouse position relatively to the cursor
     sf::Vector2i mousePosition;
+    bool isMouseOutOfImage();
     
     // Cursor
     sf::Vector2f cursorPosition; // Precise cursor position
