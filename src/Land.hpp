@@ -63,6 +63,10 @@ class Land{
     
     // Size of the pixel arrays
     int width, height;
+    
+    // Serialization
+    void save(std::string);
+    void load(std::string);
 
   private:
     // Pixel groups handling
