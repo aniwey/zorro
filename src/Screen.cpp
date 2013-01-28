@@ -62,7 +62,7 @@ void Screen::adaptToLand(Land& l){
   screenImage.create(imageWidth, imageHeight);
   screenSprite.setScale(4, 4);
   screenTexture.loadFromImage(screenImage);
-  screenSprite.setTexture(screenTexture);
+  screenSprite.setTexture(screenTexture, true); // "true" allow the sprite to adapt itself to a change in the texture's size
   
   // Cursor
   cursorPosition = getMouseCursorPosition();
