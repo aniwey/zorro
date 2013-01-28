@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <list>
-#include <vector>
+#include <boost/serialization/vector.hpp>
 
 #include <SFML/Graphics.hpp>
 

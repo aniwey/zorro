@@ -22,6 +22,8 @@ Land_loopDirt.o: src/Land_loopDirt.cpp src/Land.hpp src/Pixel.hpp \
  src/Entity.hpp src/pixelType.hpp src/random.hpp
 ToolbarButton.o: src/ToolbarButton.cpp src/ToolbarButton.hpp \
  src/ConfigData.hpp src/ImageManager.hpp src/pixelType.hpp
+Land_save_and_load.o: src/Land_save_and_load.cpp src/Land.hpp \
+ src/Pixel.hpp src/Entity.hpp src/pixelType.hpp src/random.hpp
 Entity.o: src/Entity.cpp src/Entity.hpp
 algo.o: src/algo.cpp src/algo.hpp
 Screen_handleEvents.o: src/Screen_handleEvents.cpp src/Screen.hpp \

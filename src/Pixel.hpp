@@ -39,6 +39,16 @@ class Pixel{
     Entity* entity; // Pointer towards the entity the pixel is attached to (optional)
   
   private:
+    // Serialization
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive& ar, const unsigned int version){
+        ar & type;
+        ar & color;
+        ar & group;
+        ar & entity;
+    }
+  
     // Private functions used by create() method
     bool createEntity(pixelType, Land&, int, int); // Return true if an entity was created
 };
