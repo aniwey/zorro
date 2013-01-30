@@ -33,6 +33,7 @@ void Screen::init(ConfigData& mainConfig){
   }
   window.setFramerateLimit(60);
   window.setMouseCursorVisible(false);
+  window.setKeyRepeatEnabled(false);
   
   // Interface view
   interfaceView.setCenter(width/2, height/2);
