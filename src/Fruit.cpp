@@ -2,17 +2,19 @@
 
 #include "Fruit.hpp"
 
-Fruit::Fruit(Land& l, int x, int y): Entity(l.frame_id){
+Fruit::Fruit(Land& l, int x, int y): Entity(l.frame_id, x, y){
   // Get color of the pixel that's under us
-  leavesColorUnderUs = l.p[x][y].color;
+  leavesColorUnderUs = l.p[pixelX][pixelY].color;
   
   // Set type
-  l.p[x][y].type = pixelType_FRUIT;
+  l.p[pixelX][pixelY].type = pixelType_FRUIT;
   
   // Set color
-  l.p[x][y].setColorBasedOnType();
+  l.p[pixelX][pixelY].setColorBasedOnType();
   
   // Set group : we keep the group of the pixel under us
+  
+  // Set feltAtThisFrame : we keep the value from the pixel under us
     
   // Set private parameters
   step = fruitStep_RIPENING;
@@ -25,13 +27,14 @@ Fruit::~Fruit(){
   
 }
 
-void Fruit::isGoingToFall(){
-  // If we're landing, we're not anymore because we felt
-  if(dyingStep == fruitDyingStep_LANDING_COULD_BEGIN_DYING) dyingStep = fruitDyingStep_NOTHING;
-}
-
-bool Fruit::loop(Land& l, int x, int y){
+bool Fruit::loop(Land& l){
   last_frame_id = l.frame_id;
+  
+  // If the pixel where the fruit is just felt
+  if(l.p[pixelX][pixelY].feltAtThisFrame == l.frame_id){
+    // If we were landing and we could begin dying, then we're not ladning anymore
+    if(dyingStep == fruitDyingStep_LANDING_COULD_BEGIN_DYING) dyingStep = fruitDyingStep_NOTHING;
+  }
   
   // Handling of the dying step
   switch(dyingStep){
@@ -42,7 +45,7 @@ bool Fruit::loop(Land& l, int x, int y){
     // If we're landing and could begin dying
     case fruitDyingStep_LANDING_COULD_BEGIN_DYING:
       if(dyingTime > 120){
-        if(l.howManyPixelsOfThisTypeInThisRectangle(pixelType_FRUIT, x-2, y-2, x+2, y+2) > 7 || l.howManyPixelsOfThisTypeInThisRectangle(pixelType_FRUIT, x, y-2, x, y+2) > 3){
+        if(l.howManyPixelsOfThisTypeInThisRectangle(pixelType_FRUIT, pixelX-2, pixelY-2, pixelX+2, pixelY+2) > 7 || l.howManyPixelsOfThisTypeInThisRectangle(pixelType_FRUIT, pixelX, pixelY-2, pixelX, pixelY+2) > 3){
           dyingStep = fruitDyingStep_DYING;
           dyingTime = 0;
         }
@@ -55,7 +58,8 @@ bool Fruit::loop(Land& l, int x, int y){
         return true; // We destroy ourselves
       }
       else{
-        l.p[x][y].color = getMidColor(sf::Color(237, 123, 0), sf::Color(107, 55, 0), 1-(float)dyingTime/60);
+        l.p[pixelX][pixelY].color = getMidColor(sf::Color(237, 123, 0), sf::Color(107, 55, 0), 1-(float)dyingTime/60);
+        l.notifyForUpdatingThisPixel(pixelX, pixelY);
         dyingTime++;
       }
     break;
@@ -69,21 +73,25 @@ bool Fruit::loop(Land& l, int x, int y){
     break;
     case fruitStep_FALLING_INSIDE_LEAVES: // If the fruit is falling inside leaves
       // If the pixel below is gaseous
-      if(y < l.height-1 && l.pixelPhysicalStateVector[l.p[x][y+1].type] == pixelPhysicalState_GASEOUS){
-        l.p[x][y+1] = l.p[x][y]; // We go down
-        l.p[x][y].type = pixelType_LEAVES; l.p[x][y].entity = 0; l.p[x][y].color = leavesColorUnderUs; // We set the leaves pixel under us
-        l.p[x][y+1].group = 0; // We have no group now
+      if(pixelY < l.height-1 && l.pixelPhysicalStateVector[l.p[pixelX][pixelY+1].type] == pixelPhysicalState_GASEOUS){
+        l.p[pixelX][pixelY+1] = l.p[pixelX][pixelY]; // We go down
+        l.p[pixelX][pixelY].type = pixelType_LEAVES; l.p[pixelX][pixelY].resetEntityPointer(); l.p[pixelX][pixelY].color = leavesColorUnderUs; // We set the leaves pixel under us
+        l.p[pixelX][pixelY+1].group = 0; // We have no group now
         step = fruitStep_JUST_FALLING; // We're just falling now, since we're out of the tree
         if(dyingStep == fruitDyingStep_NOTHING) dyingStep = fruitDyingStep_LANDING_COULD_BEGIN_DYING; // We try to be landing, which can be changed by the isGoingToFall callback
+        l.p[pixelX][pixelY+1].youJustMovedTo(pixelX, pixelY+1); // We notify the pixel
+        l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-1, pixelX+1, pixelY+1); // We notify
       }
       // Else, if the pixel below is LEAVES
-      else if(y < l.height-1 && l.p[x][y+1].type == pixelType_LEAVES){
-        int group = l.p[x][y+1].group; // We save the group of the leaves pixel where we are going
-        sf::Color color = l.p[x][y+1].color; // We save the color of the leaves pixel where we are going
-        l.p[x][y+1] = l.p[x][y]; // We go down
-        l.p[x][y+1].group = group; // We take the group of the leaves pixel where we are
-        l.p[x][y].type = pixelType_LEAVES; l.p[x][y].entity = 0; l.p[x][y].color = leavesColorUnderUs; // We set the leaves pixel under us
-        leavesColorUnderUs = color;
+      else if(pixelY < l.height-1 && l.p[pixelX][pixelY+1].type == pixelType_LEAVES){
+        Group* group = l.p[pixelX][pixelY+1].group; // We save the group of the leaves pixel where we are going
+        sf::Color color = l.p[pixelX][pixelY+1].color; // We save the color of the leaves pixel where we are going
+        l.p[pixelX][pixelY+1] = l.p[pixelX][pixelY]; // We go down
+        l.p[pixelX][pixelY+1].group = group; // We take the group of the leaves pixel where we are
+        l.p[pixelX][pixelY].type = pixelType_LEAVES; l.p[pixelX][pixelY].resetEntityPointer(); l.p[pixelX][pixelY].color = leavesColorUnderUs; // We set the leaves pixel under us
+        leavesColorUnderUs = color; // We save the color
+        l.p[pixelX][pixelY+1].youJustMovedTo(pixelX, pixelY+1); // We notify the pixel
+        l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-1, pixelX+1, pixelY+1); // We notify
       }
       // Else, we didn't felt inside leaves or out of leaves, that means we're lading, we try to be landing, which can be changed by the isGoingToFall callback
       else{

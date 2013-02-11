@@ -5,6 +5,9 @@
 #include <list>
 #include <boost/serialization/vector.hpp>
 
+#include <boost/weak_ptr.hpp>
+#include <boost/serialization/weak_ptr.hpp>
+
 #include <SFML/Graphics.hpp>
 
 #include "Pixel.hpp"
@@ -17,12 +20,6 @@ typedef enum{
   canFallState_YES_WITH_DEPS,
   canFallState_NO
 }canFallState;
-
-typedef struct{
-  canFallState canFall;
-  std::list<int> deps;
-  bool dependenciesResolved;
-}groupGravityStruct;
 
 class Land{
   public:
@@ -37,7 +34,7 @@ class Land{
     
     // Writing pixels to the land
     void writePixelRectangle(int x, int y, int w, int h, pixelType type);
-    void writeEverythingBetweenTwoOrientedIdenticalRectangles(int x1, int y1, int x2, int y2, int size, pixelType type);
+    void writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type);
     void writePixelLine(int x1, int y1, int x2, int y2, pixelType type);
     void writeSinglePixel(int x, int y, pixelType type);
     
@@ -45,18 +42,26 @@ class Land{
     std::vector<std::vector<Pixel> > p;
     
     // Pixel groups stuff
-    bool pixelGroupsArePositive;
-    int lastPixelGroupGiven;
-    int getPixelGroup();
-    void switchPixelGroupsSign();
-    void changePixelGroupRecursively(int x, int y, int oldGroup, int newGroup);
+    std::list<Group> g; // Groups list
+    std::list<Group*> gtu; // Groups to update
+    Group* getPixelGroup();
+    
+    // Updating
+    std::vector<std::list<std::pair<int, int> > > atu; // Areas to update used during the pixels loop
+    std::vector<std::list<std::pair<int, int> > > atuNotif; // Areas to update used for notifications
+    
+    void switchAtuAndAtuNotif();
+    
+    void notifyForUpdatingThisRectangle(int, int, int, int);
+    void notifyForUpdatingAroundThisPixel(int, int);
+    void notifyForUpdatingThisPixel(int, int);
     
     // Various tests on pixels
     std::vector<pixelGravity> pixelGravityVector;
     std::vector<pixelPhysicalState> pixelPhysicalStateVector;
-    bool aPixelOfThisGroupIsAdjacentToThisOne(int x, int y, int group);
+    bool aPixelOfThisGroupIsAdjacentToThisOne(int x, int y, Group* group);
     bool thisPixelExists(int x, int y);
-    int howManyPixelsOfThisTypeAndThisGroupInThisRectangle(pixelType type, int group, int x1, int y1, int x2, int y2);
+    int howManyPixelsOfThisTypeAndThisGroupInThisRectangle(pixelType type, Group* group, int x1, int y1, int x2, int y2);
     int howManyPixelsOfThisTypeInThisRectangle(pixelType type, int x1, int y1, int x2, int y2);
     
     // Frame id
@@ -68,17 +73,21 @@ class Land{
     // Serialization
     void saveGame(std::string);
     void loadGame(std::string);
+    
+    // Entities
+    std::list<boost::weak_ptr<Entity> > entities;
+    void registerEntity(boost::shared_ptr<Entity>);
 
   private:
-    // Pixel groups handling
-    std::vector<groupGravityStruct> ggs; // Used to handle pixel groups gravity, declared here to avoid allocating of new memory each loop
-    bool resolveGroupGravityStructDependencies(int);
-    
     // Loop steps
     void loopDirt();
     void loopGravity();
-    void loopGroupsSplitting();
     void loopEntities();
+    void loopPixels();
+      // loopPixels functions
+      bool tryToMakeFall(int, int);
+      void tryToMakeFallAlongWithPixelsBelow(int, int);
+      bool makeFall(int, int);
 };
 
 #endif

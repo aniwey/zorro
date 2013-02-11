@@ -6,7 +6,7 @@
 #include "Land.hpp"
 
 #define PIXELADDINGDIAMETER_MIN 1
-#define PIXELADDINGDIAMETER_MAX 20
+#define PIXELADDINGDIAMETER_MAX 100
 
 class God{
   public:

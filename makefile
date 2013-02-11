@@ -6,7 +6,7 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++11 -g -lsfml-system -lsfml-window -lsfml-graphics -lboost_serialization
 
-all: dir_obj $(PROG)
+all: $(OBJ_DIR) $(PROG)
 
 $(PROG): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(PROG) $(OBJS)
@@ -16,8 +16,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 .PHONY: clean depend dir_obj
 
-dir_obj:
-	mkdir -p ./obj
+$(OBJ_DIR):
+	mkdir ./obj
 
 clean:
 	rm -f $(PROG) $(OBJS)

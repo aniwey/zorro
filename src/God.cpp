@@ -7,7 +7,7 @@ God::God(){
 
 void God::addThings(Land& l, int oldLandCursorX, int oldLandCursorY, int newLandCursorX, int newLandCursorY, bool activeAddingEvent){
   int diameter = getAddingDiameterDependingOnPixelTypeSelected();
-  
+
   // If the pixel type selected can be added massively
   if(pixelTypeSelected != pixelType_SEED){
     // If the land cursor didn't move this loop
@@ -15,7 +15,7 @@ void God::addThings(Land& l, int oldLandCursorX, int oldLandCursorY, int newLand
       l.writePixelRectangle(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, diameter, diameter, pixelTypeSelected);
     // Else, the land cursor moved this loop
     else{
-      l.writeEverythingBetweenTwoOrientedIdenticalRectangles(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, newLandCursorX - diameter/2, newLandCursorY - diameter/2, diameter, pixelTypeSelected);
+      l.writeEverythingBetweenTwoOrientedIdenticalSquares(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, newLandCursorX - diameter/2, newLandCursorY - diameter/2, diameter, pixelTypeSelected);
     }
   }
   // Else, it can't be added massively, but it can if we just did an active adding event

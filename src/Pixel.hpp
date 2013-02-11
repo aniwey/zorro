@@ -6,11 +6,15 @@
 
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+
+#include <boost/shared_ptr.hpp>
 
 #include <SFML/Graphics/Color.hpp>
 
 #include "Entity.hpp"
 #include "Fruit.hpp"
+#include "Group.hpp"
 #include "pixelType.hpp"
 #include "random.hpp"
 #include "Seed.hpp"
@@ -25,24 +29,29 @@ class Pixel{
       std::swap(a.type, b.type);
       std::swap(a.color, b.color);
       std::swap(a.group, b.group);
-      if(a.entity != 0 || b.entity != 0) std::swap(a.entity, b.entity);
+      std::swap(a.feltAtThisFrame, b.feltAtThisFrame);
+      std::swap(a.entity, b.entity);
     }
     
     // Pixel creation
     void create(pixelType, Land&, int, int);
     void addEntity(Land&, int, int);
     void setColorBasedOnType();
-    void destroyEntity();
+    
+    void resetEntityPointer();
     
     // Other functions
     void setColor(int, int, int);
-    void setGroup(int);
+    
+    // Callbacks
+    void youJustMovedTo(int, int);
     
     // Variables
     pixelType type; // Type of the pixel
     sf::Color color; // Color of the pixel
-    int group; // Group of the pixel (optional), if =0, the pixel has no group
-    Entity* entity; // Pointer towards the entity the pixel is attached to (optional)
+    Group* group; // Group of the pixel (optional), if = 0, the pixel has no group
+    boost::shared_ptr<Entity> entity; // Pointer towards the entity the pixel is attached to (optional)
+    int feltAtThisFrame;
   
   private:
     // Serialization
@@ -55,6 +64,7 @@ class Pixel{
       ar & color;
       ar & group;
       ar & entity;
+      ar & feltAtThisFrame;
     }
   
     // Private functions used by create() method

@@ -13,6 +13,7 @@ void Screen::init(ConfigData& mainConfig){
   // Width and height
   width = 800;
   height = 600;
+  
   try{
     width = std::stoi(mainConfig.getString("resolution_width"));
     height = std::stoi(mainConfig.getString("resolution_height"));
@@ -48,9 +49,9 @@ void Screen::init(ConfigData& mainConfig){
 
 void Screen::adaptToLand(Land& l){
   // Land view
-  viewIdealCenter = sf::Vector2f(l.width*2, l.height*2);
+  viewIdealCenter = sf::Vector2f(l.width/2, l.height/2);
   view.setCenter(viewIdealCenter);
-  viewIdealSize = sf::Vector2f(l.width*4, l.height*4);
+  viewIdealSize = sf::Vector2f(l.width, l.height);
   view.setSize(width, height);
   window.setView(view);
   viewZoom = 1;
@@ -61,7 +62,6 @@ void Screen::adaptToLand(Land& l){
   
   // Image, sprite and texture
   screenImage.create(imageWidth, imageHeight);
-  screenSprite.setScale(4, 4);
   screenTexture.loadFromImage(screenImage);
   screenSprite.setTexture(screenTexture, true); // "true" allow the sprite to adapt itself to a change in the texture's size
   
@@ -84,8 +84,8 @@ sf::Vector2f Screen::getMouseCursorPosition(){
   return window.mapPixelToCoords(sf::Mouse::getPosition());
 }
 
-sf::Vector2i Screen::getTheoreticalMousePosition(){
-  return window.mapCoordsToPixel(cursorPosition);
+void Screen::putMouseOnCursorCenter(){
+  sf::Mouse::setPosition(window.mapCoordsToPixel(sf::Vector2f((int)cursorPosition.x + 0.5, (int)cursorPosition.y + 0.5)));
 }
 
 void Screen::correctViewPosition(){
@@ -179,8 +179,6 @@ bool Screen::correctCursorPosition(){
 }
 
 sf::Vector2i Screen::getLandCursorPositionFromThisPosition(sf::Vector2f pos){
-  pos.x /= 4;
-  pos.y /= 4;
   return (sf::Vector2i)pos;
 }
 

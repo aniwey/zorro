@@ -24,8 +24,7 @@ class Seed:public Entity{
     Seed(Land&, int, int);
     ~Seed();
     
-    bool loop(Land&, int, int);
-    void isGoingToFall();
+    bool loop(Land&);
     
   private:
     // Serialization

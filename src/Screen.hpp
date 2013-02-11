@@ -88,9 +88,9 @@ class Screen{
     
     // Mouse
     sf::Vector2f getMouseCursorPosition(); // Get cursor position relatively to the mouse
-    sf::Vector2i getTheoreticalMousePosition(); // Get mouse position relatively to the cursor
     sf::Vector2i mousePosition;
     bool isMouseOutOfImage();
+    void putMouseOnCursorCenter();
     
     // Cursor
     sf::Vector2f cursorPosition; // Precise cursor position
@@ -115,6 +115,8 @@ class Screen{
     void drawToolbar(Toolbar&, God&);
     void drawToolbarButton(ToolbarButton&, sf::Vector2f, God&);
     void drawCursor(God&);
+    void drawNormalCursor(God&);
+    void drawInterfaceCursor();
     void endDrawing();
 };
 

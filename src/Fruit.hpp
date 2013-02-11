@@ -26,8 +26,7 @@ class Fruit:public Entity{
     Fruit(Land&, int, int);
     ~Fruit();
     
-    bool loop(Land&, int, int);
-    void isGoingToFall();
+    bool loop(Land&);
     
   private:
     // Serialization

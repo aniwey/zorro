@@ -3,35 +3,45 @@
 #include <iostream>
 
 #include "Fruit.hpp"
+#include "Land.hpp"
 #include "Seed.hpp"
 
-Pixel::Pixel(): color(sf::Color(0, 0, 0)), group(0), entity(0){
+Pixel::Pixel(): color(sf::Color(0, 0, 0)), group(0), entity(), feltAtThisFrame(0){
   
 }
 
 Pixel::~Pixel(){
-  destroyEntity();
+  resetEntityPointer();
 }
 
 void Pixel::create(pixelType _type, Land& l, int x, int y){
-  destroyEntity();
+  // If we had an entity, we stop pointing to our entity
+  resetEntityPointer();
+  
   if(!createEntity(_type, l, x, y)){ // If no entity is created
     // Then it's our duty to set attributes
     type = _type;
     setColorBasedOnType();
-    setGroup(0);
+    if(group != 0) group = group->unregisterPixel(l, x, y, true);
+    feltAtThisFrame = 0;
   }
+}
+
+void Pixel::resetEntityPointer(){
+  entity = boost::shared_ptr<Entity>();
 }
 
 bool Pixel::createEntity(pixelType _type, Land& l, int x, int y){
   // Potentially add entity
   switch(_type){
     case pixelType_SEED:
-      entity = new Seed(l, x, y);
+      entity = boost::shared_ptr<Entity>(new Seed(l, x, y));
+      l.registerEntity(entity);
       return true;
     break;
     case pixelType_FRUIT:
-      entity = new Fruit(l, x, y);
+      entity = boost::shared_ptr<Entity>(new Fruit(l, x, y));
+      l.registerEntity(entity);
       return true;
     break;
     default:
@@ -41,10 +51,10 @@ bool Pixel::createEntity(pixelType _type, Land& l, int x, int y){
   }
 }
 
-void Pixel::destroyEntity(){
-  if(entity != 0){
-    delete entity;
-    entity = 0;
+void Pixel::youJustMovedTo(int x, int y){
+  if(entity){
+    entity->pixelX = x;
+    entity->pixelY = y;
   }
 }
 
@@ -76,8 +86,4 @@ void Pixel::setColorBasedOnType(){
       setColor(0, 0, 0);
     break;
   }
-}
-
-void Pixel::setGroup(int _group){
-  group = _group;
 }

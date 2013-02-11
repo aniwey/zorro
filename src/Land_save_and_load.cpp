@@ -8,8 +8,6 @@
 void Land::saveGame(std::string filename){
   std::ofstream ofs(filename);
   boost::archive::binary_oarchive oa(ofs);
-  oa << pixelGroupsArePositive;
-  oa << lastPixelGroupGiven;
   oa << width;
   oa << height;
   for(int i = 0; i < width; ++i){
@@ -23,8 +21,6 @@ void Land::loadGame(std::string filename){
   // Load serialized data
   std::ifstream ifs(filename);
   boost::archive::binary_iarchive ia(ifs);
-  ia >> pixelGroupsArePositive;
-  ia >> lastPixelGroupGiven;
   ia >> width;
   ia >> height;
   init(width, height); // Init land (resize the vector)

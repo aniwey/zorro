@@ -8,18 +8,21 @@ class Land;
 class Entity{
   public:
     Entity();
-    Entity(int frame_id);
+    Entity(int, int, int);
     virtual ~Entity();
     
-    virtual bool loop(Land&, int, int) = 0; // Function called each loop, return true if the entity should be destroyed
-    virtual void isGoingToFall(){ } // Callback called when the pixel containing the entity fell because of an external function
+    virtual bool loop(Land&) = 0; // Function called each loop, return true if the entity should be destroyed
     
     int last_frame_id; // Contains the identifier of the last frame when the entity looped
+    int pixelX, pixelY;
     
   private:
     friend class boost::serialization::access;
     template<class Archive>
-    void serialize(Archive &, const unsigned int){}
+    void serialize(Archive & ar, const unsigned int){
+      ar & pixelX;
+      ar & pixelY;  
+    }
 };
 
 #endif

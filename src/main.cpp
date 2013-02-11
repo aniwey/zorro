@@ -30,11 +30,16 @@ int main(void){
   Interface i;
   i.init(s, textStrings);
   
+  // Draw a first time
+  s.draw(l, g, i);
+  
   // Other stuff
   bool exit = 0;
   initRandom();
   
   while(!exit){
+    std::cout << l.entities.size() << std::endl;
+    l.switchAtuAndAtuNotif();
     l.loop();
     s.handleEvents(l, g, i, exit);
     i.loop();

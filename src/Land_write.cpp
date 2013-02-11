@@ -15,7 +15,7 @@ void Land::writePixelRectangle(int x, int y, int w, int h, pixelType type){
   }
 }
 
-void Land::writeEverythingBetweenTwoOrientedIdenticalRectangles(int x1, int y1, int x2, int y2, int size, pixelType type){
+void Land::writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type){
   // If we're trying to draw a line, then we just draw a line
   if(size == 1)
     writePixelLine(x1, y1, x2, y2, type);
@@ -65,8 +65,10 @@ void Land::writeEverythingBetweenTwoOrientedIdenticalRectangles(int x1, int y1, 
 }
 
 void Land::writeSinglePixel(int x, int y, pixelType type){
-  if(x >= 0 && y >= 0 && x < width && y < height)
+  if(x >= 0 && y >= 0 && x < width && y < height){
     p[x][y].create(type, *this, x, y);
+    notifyForUpdatingAroundThisPixel(x, y);
+  }
 }
 
 void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){

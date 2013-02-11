@@ -9,14 +9,14 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
   // If the cursor was locked by right clicking during the previous loop but we're not right clicking anymore
   if(cursorLockedState == cursorLockedState_LOCKED_BY_RIGHT_CLICKING && sf::Mouse::isButtonPressed(sf::Mouse::Right) == false){
     // We move the mouse on the cursor, which we unlock
-    sf::Mouse::setPosition(getTheoreticalMousePosition());
+    putMouseOnCursorCenter();
     cursorLockedState = cursorLockedState_NOT_LOCKED;
   }
   
   // If the cursor was locked by CTRL but we don't press this key anymore
   if(cursorLockedState != cursorLockedState_LOCKED_BY_RIGHT_CLICKING && cursorLockedState != cursorLockedState_NOT_LOCKED && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) == false){
     // We move the mouse on the cursor, which we unlock
-    sf::Mouse::setPosition(getTheoreticalMousePosition());
+    putMouseOnCursorCenter();
     cursorLockedState = cursorLockedState_NOT_LOCKED;
   }
 
@@ -38,23 +38,26 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
           break;
           case sf::Keyboard::Z: // If we pressed z
             if(viewZoom == 1) changeZoom(0.5);
-            else if(viewZoom == 0.5) changeZoom(1);
+            else if(viewZoom == 0.5) changeZoom(0.25);
+            else if(viewZoom == 0.25) changeZoom(0.125);
+            else if(viewZoom == 0.125) changeZoom(0.0625);
+            else if(viewZoom == 0.0625) changeZoom(1);
             putMouseOnCursor = true;
           break;
           case sf::Keyboard::Up:
-            newCursorPosition.y -= 4;
+            newCursorPosition.y -= 1;
             putMouseOnCursor = true;
           break;
           case sf::Keyboard::Down:
-            newCursorPosition.y += 4;
+            newCursorPosition.y += 1;
             putMouseOnCursor = true;
           break;
           case sf::Keyboard::Left:
-            newCursorPosition.x -= 4;
+            newCursorPosition.x -= 1;
             putMouseOnCursor = true;
           break;
           case sf::Keyboard::Right:
-            newCursorPosition.x += 4;
+            newCursorPosition.x += 1;
             putMouseOnCursor = true;
           break;
           case sf::Keyboard::Space:
@@ -111,7 +114,7 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
   
   // Put mouse on cursor if needed
   if(putMouseOnCursor){
-    sf::Mouse::setPosition(getTheoreticalMousePosition());
+    putMouseOnCursorCenter();
   }
   
   // Store the old mouse position
@@ -120,7 +123,7 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
   
   // Check if the cursor is used by the interface, only if the cursor isn't lock by right clicking
   if(cursorLockedState != cursorLockedState_LOCKED_BY_RIGHT_CLICKING){
-    cursorIsUsedByTheInterface = i.isCursorUsed(getTheoreticalMousePosition());
+    cursorIsUsedByTheInterface = i.isCursorUsed((sf::Vector2i)cursorPosition);
   }
   
   // If the cursor isn't used by the interface, make god add things
@@ -136,7 +139,7 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
   }
   else{ // Else, the cursor is used by the interface
     if(activeAddingEvent){
-      i.leftButtonPressed(g, getTheoreticalMousePosition());
+      i.leftButtonPressed(g, (sf::Vector2i)cursorPosition);
     }
   }
 }

@@ -70,43 +70,63 @@ void Screen::drawToolbarButton(ToolbarButton& button, sf::Vector2f toolbarOrigin
 }
 
 void Screen::drawCursor(God& g){
-  // Calculate the gap we need to substract from currentLandCursorPosition.x*4 in order to draw the cursor at the correct place
+  if(cursorIsUsedByTheInterface)
+    drawInterfaceCursor();
+  else
+    drawNormalCursor(g);
+}
+
+void Screen::drawNormalCursor(God& g){
+  float outline, size, gap;
+  
+  // Calculate the outline : it depends on the view zoom, the smaller viewZoom is, the smaller outline will be
+  outline = viewZoom;
+  
+  // Calculate the size (with borders)
+  size = g.getAddingDiameterDependingOnPixelTypeSelected();
+  
+  // Calculate the gap we need to substract from currentLandCursorPosition in order to draw the cursor at the correct place
   // It must take in account parity of pixelAddingDiameter (which explains the % 2)
-  float outline = 1 * viewZoom;
-  int size = g.getAddingDiameterDependingOnPixelTypeSelected(), gap;
-  if(size % 2 == 1) gap = (size-1) * 2;
-  else gap = size * 2;
-  
-  if(cursorIsUsedByTheInterface == false){ // If the cursor isn't currently used by the interface, we draw the normal cursor
-    // Draw the point inside the rectangle
-    sf::Vertex vertices[] = { sf::Vertex(cursorPosition, sf::Color(0, 0, 0)) };
-    window.draw(vertices, 1, sf::Points);
-  
-    // Draw the rectangle around the cursor
-    sf::RectangleShape rect(sf::Vector2f(size*4 - outline*2, size*4 - outline*2));
-    rect.setPosition(landCursorPosition.x*4 - gap + outline, landCursorPosition.y*4 - gap + outline);
-    rect.setFillColor(sf::Color(0, 0, 0, 0));
-    rect.setOutlineColor(sf::Color(0, 0, 0));
-    rect.setOutlineThickness(outline);
-    window.draw(rect);
-    
-    // Draw another cursor if the mouse is out of land's image
-    if(isMouseOutOfImage()){
-      sf::Vector2f pos = getMouseCursorPosition();
-      sf::Vertex vertices[] = { sf::Vertex(sf::Vector2f(pos.x - 5*viewZoom, pos.y - 5*viewZoom), sf::Color(255, 255, 255)),
-                              sf::Vertex(sf::Vector2f(pos.x + 5*viewZoom, pos.y + 5*viewZoom), sf::Color(255, 255, 255)),
-                              sf::Vertex(sf::Vector2f(pos.x + 5*viewZoom, pos.y - 5*viewZoom), sf::Color(255, 255, 255)),
-                              sf::Vertex(sf::Vector2f(pos.x - 5*viewZoom, pos.y + 5*viewZoom), sf::Color(255, 255, 255)) };
-      window.draw(vertices, 4, sf::Lines);
-    }
+  if(size - outline*2 < 1){ // If the rect should be smaller than the pixels we add
+    size = 1 + outline*2;
+    gap = (size-1) / 2;
   }
-  else{ // Else, we draw the interface cursor
-    sf::Vertex vertices[] = { sf::Vertex(sf::Vector2f(cursorPosition.x - 5*viewZoom, cursorPosition.y - 5*viewZoom), sf::Color(0, 0, 0)),
+  else{
+    if((int)size % 2 == 1) gap = (size-1) / 2;
+    else gap = size/2;
+  }
+  
+  // Substract the border from the size
+  size -= outline*2;
+  
+  // Draw the point inside the rectangle
+  sf::Vertex vertices[] = { sf::Vertex(cursorPosition, sf::Color(0, 0, 0)) };
+  window.draw(vertices, 1, sf::Points);
+  
+  // Draw the rectangle around the cursor
+  sf::RectangleShape rect(sf::Vector2f(size, size));
+  rect.setPosition(landCursorPosition.x - gap + outline, landCursorPosition.y - gap + outline);
+  rect.setFillColor(sf::Color(0, 0, 0, 0));
+  rect.setOutlineColor(sf::Color(0, 0, 0));
+  rect.setOutlineThickness(outline);
+  window.draw(rect);
+    
+  // Draw another cursor if the mouse is out of land's image
+  if(isMouseOutOfImage()){
+    sf::Vertex vertices[] = { sf::Vertex(sf::Vector2f(cursorPosition.x - 5*viewZoom, cursorPosition.y - 5*viewZoom), sf::Color(255, 255, 255)),
+                            sf::Vertex(sf::Vector2f(cursorPosition.x + 5*viewZoom, cursorPosition.y + 5*viewZoom), sf::Color(255, 255, 255)),
+                            sf::Vertex(sf::Vector2f(cursorPosition.x + 5*viewZoom, cursorPosition.y - 5*viewZoom), sf::Color(255, 255, 255)),
+                            sf::Vertex(sf::Vector2f(cursorPosition.x - 5*viewZoom, cursorPosition.y + 5*viewZoom), sf::Color(255, 255, 255)) };
+    window.draw(vertices, 4, sf::Lines);
+  }
+}
+
+void Screen::drawInterfaceCursor(){
+  sf::Vertex vertices[] = { sf::Vertex(sf::Vector2f(cursorPosition.x - 5*viewZoom, cursorPosition.y - 5*viewZoom), sf::Color(0, 0, 0)),
                               sf::Vertex(sf::Vector2f(cursorPosition.x + 5*viewZoom, cursorPosition.y + 5*viewZoom), sf::Color(0, 0, 0)),
                               sf::Vertex(sf::Vector2f(cursorPosition.x + 5*viewZoom, cursorPosition.y - 5*viewZoom), sf::Color(0, 0, 0)),
                               sf::Vertex(sf::Vector2f(cursorPosition.x - 5*viewZoom, cursorPosition.y + 5*viewZoom), sf::Color(0, 0, 0)) };
-    window.draw(vertices, 4, sf::Lines);
-  }
+  window.draw(vertices, 4, sf::Lines);
 }
 
 void Screen::endDrawing(){
