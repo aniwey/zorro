@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <boost/lexical_cast.hpp>
+
 #include <SFML/Graphics.hpp>
 
 #include "ConfigData.hpp"
@@ -81,7 +83,9 @@ class Screen{
     sf::Event event;
     
     // Time
-    sf::Clock clock;
+    sf::Clock fpsClock;
+    sf::Text fpsText;
+    int fpsClockStep;
     
     // Fonts
     sf::Font defaultFont;
@@ -117,6 +121,7 @@ class Screen{
     void drawCursor(God&);
     void drawNormalCursor(God&);
     void drawInterfaceCursor();
+    void drawFPS();
     void endDrawing();
 };
 

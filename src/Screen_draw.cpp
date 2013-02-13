@@ -9,7 +9,23 @@ void Screen::draw(Land& l, God& g, Interface& i){
   drawLand(l);
   drawInterface(i, g);
   drawCursor(g);
+  drawFPS();
   endDrawing();
+}
+
+void Screen::drawFPS(){
+  useInterfaceView();
+  
+  // Update fpsText's string if needed
+  if(fpsClockStep == 9){
+    fpsText.setString(boost::lexical_cast<std::string>((int)(1/(fpsClock.restart().asSeconds()/10))));
+    fpsClockStep = 0;
+  }
+  else fpsClockStep++;
+  
+  window.draw(fpsText);
+
+  useNormalView();
 }
 
 void Screen::drawLand(Land& l){

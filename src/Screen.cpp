@@ -3,6 +3,13 @@
 Screen::Screen(){
   // Fonts
   defaultFont.loadFromFile("./fonts/LiberationMono-Regular.ttf");
+  
+  // Fps
+  fpsText.setString("???");
+  fpsText.setCharacterSize(25);
+  fpsText.setFont(defaultFont);
+  fpsText.setColor(sf::Color(255, 0, 0));
+  fpsClockStep = 0;
 }
 
 Screen::~Screen(){

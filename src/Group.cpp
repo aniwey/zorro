@@ -66,14 +66,14 @@ Group* Group::unregisterPixel(Land& l, int x, int y, bool removeTheDependencyLin
       l.p[pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.first][pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.second].group->
         pixels[GroupPixel(pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.first, pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.second)].type = GroupDependencyType_NOTHING;
     }
-  
+
     // If we depend on a pixel, we must tell it that no pixel depend on it anymore
     if(pixels[GroupPixel(x, y)].type == GroupDependencyType_GROUP){
       l.p[pixels[GroupPixel(x, y)].pixelWeDependOn.first][pixels[GroupPixel(x, y)].pixelWeDependOn.second].group->
         pixels[GroupPixel(pixels[GroupPixel(x, y)].pixelWeDependOn.first, pixels[GroupPixel(x, y)].pixelWeDependOn.second)].aPixelDependsOnUs = false;
     }
   }
-  
+
   // Remove the pixel
   pixels.erase(GroupPixel(x, y));
   

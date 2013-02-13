@@ -38,7 +38,6 @@ int main(void){
   initRandom();
   
   while(!exit){
-    std::cout << l.entities.size() << std::endl;
     l.switchAtuAndAtuNotif();
     l.loop();
     s.handleEvents(l, g, i, exit);
