@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <list>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization/list.hpp>
 
 #include <boost/weak_ptr.hpp>
 #include <boost/serialization/weak_ptr.hpp>
@@ -77,6 +77,9 @@ class Land{
     // Entities
     std::list<boost::weak_ptr<Entity> > entities;
     void registerEntity(boost::shared_ptr<Entity>);
+    
+    // Bool to redraw everything
+    bool redrawEverything;
 
   private:
     // Loop steps
@@ -86,7 +89,7 @@ class Land{
     void loopPixels();
       // loopPixels functions
       bool tryToMakeFall(int, int);
-      void tryToMakeFallAlongWithPixelsBelow(int, int);
+      bool tryToMakeFallAlongWithPixelsBelow(int, int);
       bool makeFall(int, int);
 };
 

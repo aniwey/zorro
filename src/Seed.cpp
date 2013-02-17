@@ -23,7 +23,7 @@ Seed::Seed(Land& l, int x, int y): Entity(l.frame_id, x, y){
   // Create the seed pixel
   l.p[pixelX][pixelY].type = pixelType_SEED;
   l.p[pixelX][pixelY].setColorBasedOnType();
-  if(l.p[pixelX][pixelY].group != 0) l.p[pixelX][pixelY].group = l.p[pixelX][pixelY].group->unregisterPixel(l, x, y, true);
+  if(l.p[pixelX][pixelY].group != 0) l.p[pixelX][pixelY].group = l.p[pixelX][pixelY].group->unregisterPixel(x, y, true);
   l.p[pixelX][pixelY].feltAtThisFrame = 0;
 }
 

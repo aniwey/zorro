@@ -30,9 +30,6 @@ int main(void){
   Interface i;
   i.init(s, textStrings);
   
-  // Draw a first time
-  s.draw(l, g, i);
-  
   // Other stuff
   bool exit = 0;
   initRandom();

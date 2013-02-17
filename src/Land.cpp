@@ -38,6 +38,9 @@ void Land::init(int x, int y){
   
   // Memory allocation of atuNotif
   atuNotif.resize(width);
+  
+  // At first, we're gonna redraw everything
+  redrawEverything = true;
 }
 
 void Land::newGame(int x, int y){

@@ -47,33 +47,67 @@ void Land::loopPixels(){
     for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
       for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
         if(p[i][j].group != 0){ // If this pixel has a group
+          // We get the group pixel corresponding to the pixel and we save it for future operations
+          boost::shared_ptr<GroupPixel> groupPixelWeAreWorkingOn = p[i][j].group->getGroupPixelSharedPtr(i, j);
+        
+          // We save the old dependency
+          GroupDependencyType oldDependencyType = groupPixelWeAreWorkingOn->depType;
+          
           // We set the default dependency, which will be applied if nothing relevant is found below the pixel
-          p[i][j].group->pixels[GroupPixel(i, j)].type = GroupDependencyType_BOTTOM_OF_THE_MAP;
+          groupPixelWeAreWorkingOn->depType = GroupDependencyType_BOTTOM_OF_THE_MAP;
           
           // We search below until we find a pixel with a group / which can't fall / gaseous
           for(int k = j+1; k < height; ++k){
-            if(p[i][k].group != 0){ // Else, if this pixel below has a group
+            if(p[i][k].group != 0){ // If this pixel below has a group
               if(p[i][j].group != p[i][k].group){ // If its group is different from ours
-                // We now depend on it
-                p[i][j].group->pixels[GroupPixel(i, j)].type = GroupDependencyType_GROUP;
-                p[i][j].group->pixels[GroupPixel(i, j)].pixelWeDependOn = GroupPixel(i, k);
-                // And it now depends on us
-                p[i][k].group->pixels[GroupPixel(i, k)].aPixelDependsOnUs = true;
-                p[i][k].group->pixels[GroupPixel(i, k)].pixelWhichDependsOnUs = GroupPixel(i, j);
+                // We get the group pixel corresponding to it and we save it for future operations
+                boost::shared_ptr<GroupPixel> groupPixelWeAreGoingToDependOn = p[i][k].group->getGroupPixelSharedPtr(i, k);
+              
+                // If we were already depending on a pixel
+                if(oldDependencyType == GroupDependencyType_GROUP){
+                  // And we can access it
+                  if(boost::shared_ptr<GroupPixel> pixelWeDependOn = groupPixelWeAreWorkingOn->pixelWeDependOn.lock()){
+                    // If the group pixel we were depending on isn't the group pixel we found
+                    if(*pixelWeDependOn != GroupPixel(i, k)){
+                      // We tell the group pixel we were depending on that no pixel depends on it anymore
+                      pixelWeDependOn->aPixelDependsOnUs = false;
+                    }
+                  }
+                }
+                
+                // We now depend on the new pixel
+                groupPixelWeAreWorkingOn->depType = GroupDependencyType_GROUP;
+                groupPixelWeAreWorkingOn->pixelWeDependOn = boost::weak_ptr<GroupPixel>(groupPixelWeAreGoingToDependOn);
+                
+                // If it already has a pixel depending on it
+                if(groupPixelWeAreGoingToDependOn->aPixelDependsOnUs == true){
+                  // And we can access it
+                  if(boost::shared_ptr<GroupPixel> pixelWhichDependsOnTheGroupPixelWeAreGoingToDependOn = groupPixelWeAreGoingToDependOn->pixelWhichDependsOnUs.lock()){
+                    // If this pixel depending on it isn't already us
+                    if(*pixelWhichDependsOnTheGroupPixelWeAreGoingToDependOn != GroupPixel(i, j)){
+                      // We tell the pixel which depends on it that he depends on us now !
+                      pixelWhichDependsOnTheGroupPixelWeAreGoingToDependOn->pixelWeDependOn = boost::weak_ptr<GroupPixel>(groupPixelWeAreWorkingOn);
+                    }
+                  }
+                }
+                
+                // Aaaand we finally tell it that we depend on it now
+                groupPixelWeAreGoingToDependOn->aPixelDependsOnUs = true;
+                groupPixelWeAreGoingToDependOn->pixelWhichDependsOnUs = boost::weak_ptr<GroupPixel>(groupPixelWeAreWorkingOn);
               }
               else{ // Else, same group as ours, no dependency
-                p[i][j].group->pixels[GroupPixel(i, j)].type = GroupDependencyType_NOTHING;
+                groupPixelWeAreWorkingOn->depType = GroupDependencyType_NOTHING;
               }
               break;
             }
             // Else, if this pixel below can't fall, we set the dependency
             else if(pixelGravityVector[p[i][k].type] == pixelGravity_CANT_FALL){
-              p[i][j].group->pixels[GroupPixel(i, j)].type = GroupDependencyType_CANT_FALL_PIXEL;
+              groupPixelWeAreWorkingOn->depType = GroupDependencyType_CANT_FALL_PIXEL;
               break;
             }
             // Else, if this pixel below is gaseous, there's no dependency
             else if(pixelPhysicalStateVector[p[i][k].type] == pixelPhysicalState_GASEOUS){
-              p[i][j].group->pixels[GroupPixel(i, j)].type = GroupDependencyType_NOTHING;
+              groupPixelWeAreWorkingOn->depType = GroupDependencyType_NOTHING;
               break;
             }
           }
@@ -122,9 +156,11 @@ void Land::loopPixels(){
   // Apply gravity on group pixels of all groups if gravity wasn't already applied on them just before
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups in 
     if((*it).canFall()){ // If this group can fall
-      for(std::map<GroupPixel, GroupDependency>::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); it2++){ // Iteration over pixels in this group to update
-        if(p[(*it2).first.first][(*it2).first.second].feltAtThisFrame < frame_id){ // If this pixel didn't just felt
-          tryToMakeFallAlongWithPixelsBelow((*it2).first.first, (*it2).first.second); // We try to make it fall
+      for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); it2++){ // Iteration over pixels in this group to update
+        if(p[(*it2)->x][(*it2)->y].feltAtThisFrame < frame_id){ // If this pixel didn't just felt
+          // We try to make it fall, if it felt, it means we unregistered it, so we must decrease iterator
+          if(tryToMakeFallAlongWithPixelsBelow((*it2)->x, (*it2)->y))
+            it2--;
         }
       }
     }
@@ -152,7 +188,7 @@ bool Land::tryToMakeFall(int x, int y){
   return false;
 }
 
-void Land::tryToMakeFallAlongWithPixelsBelow(int x, int y){
+bool Land::tryToMakeFallAlongWithPixelsBelow(int x, int y){
   int maxHeight;
 
   // Calculate maxHeight (height to which we'll make pixels fall)
@@ -171,7 +207,10 @@ void Land::tryToMakeFallAlongWithPixelsBelow(int x, int y){
     for(int j = maxHeight-1; j >= y; --j){
       makeFall(x, j);
     }
+    return true;
   }
+  
+  return false;
 }
 
 bool Land::makeFall(int x, int y){
@@ -196,7 +235,7 @@ bool Land::makeFall(int x, int y){
       // We tell the pixel that he moved
       p[x][y+1].youJustMovedTo(x, y+1);
       // We unregister the old pixel and register the new one, so that our group can track us
-      p[x][y+1].group->unregisterPixel((*this), x, y, true);
+      p[x][y+1].group->unregisterPixel(x, y, true);
       p[x][y+1].group->registerPixel(x, y+1);
       // We set that it felt at this frame
       p[x][y+1].feltAtThisFrame = frame_id;

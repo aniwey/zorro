@@ -1,10 +1,14 @@
 #ifndef HPP_GROUP
 #define HPP_GROUP
 
-#include <boost/serialization/map.hpp>
+#include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>
 
-typedef std::pair<int, int> GroupPixel;
+#include <boost/weak_ptr.hpp>
+#include <boost/serialization/weak_ptr.hpp>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 enum GroupDependencyType{
   GroupDependencyType_NOTHING,
@@ -15,22 +19,43 @@ enum GroupDependencyType{
 
 class Group;
 
-struct GroupDependency{
-  // Our dependency
-  GroupDependencyType type;
-  GroupPixel pixelWeDependOn;
+class GroupPixel{
+  public:
+    GroupPixel();
+    GroupPixel(int, int);
   
-  // The pixel which depends on us
-  bool aPixelDependsOnUs;
-  GroupPixel pixelWhichDependsOnUs;
+    // Our position
+    int x, y;
   
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int){
-    ar & type;
-    ar & pixelWeDependOn;
-    ar & aPixelDependsOnUs;
-    ar & pixelWhichDependsOnUs;
-  }
+    // Our dependency
+    GroupDependencyType depType;
+    boost::weak_ptr<GroupPixel> pixelWeDependOn;
+  
+    // The pixel which depends on us
+    bool aPixelDependsOnUs;
+    boost::weak_ptr<GroupPixel> pixelWhichDependsOnUs;
+    
+    // ==
+    bool operator == (const GroupPixel& gp) const{
+      return ((x == gp.x) && (y == gp.y));
+    }
+    
+    // !=
+    bool operator != (const GroupPixel& gp) const{
+      return !((x == gp.x) && (y == gp.y));
+    }
+  
+  private:
+    // Serialization
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int){
+      ar & x;
+      ar & y;
+      ar & depType;
+      ar & pixelWeDependOn;
+      ar & pixelWhichDependsOnUs;
+    }
 };
 
 class Land;
@@ -40,7 +65,8 @@ class Group{
     Group();
   
     Group* registerPixel(int, int);
-    Group* unregisterPixel(Land&, int, int, bool);
+    Group* registerPixel(boost::shared_ptr<GroupPixel>);
+    Group* unregisterPixel(int, int, bool);
     
     void checkForSplitting(Land&);
     void changePixelGroupRecursively(Land&, int, int, Group*);
@@ -51,9 +77,13 @@ class Group{
     
     bool canFall();
     
-    std::map<GroupPixel, GroupDependency> pixels;
+    std::list<boost::shared_ptr<GroupPixel> > pixels;
     bool canFallBool;
     bool checked; // Used for example by the dependencies resolving function
+    
+    boost::shared_ptr<GroupPixel> getGroupPixelSharedPtr(int, int);
+    
+    void removePixel(int, int);
   
   private:
     // Serialization

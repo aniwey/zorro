@@ -15,8 +15,8 @@ bool Group::resolveDependencies(Land& l){
   if(checked == false){
     checked = true;
     canFallBool = true; // We presume it can fall, let's try to prove the contrary !
-    for(std::map<GroupPixel, GroupDependency>::iterator it = pixels.begin(); it != pixels.end(); it++){ // Iteration over pixels
-      switch((*it).second.type){ // Switch on the dependency type of the pixel
+    for(std::list<boost::shared_ptr<GroupPixel> >::iterator it = pixels.begin(); it != pixels.end(); it++){ // Iteration over pixels
+      switch((*it)->depType){ // Switch on the dependency type of the pixel
         case GroupDependencyType_NOTHING:
           // The pixel has no dependency -> it changes nothing
         break;
@@ -29,10 +29,17 @@ bool Group::resolveDependencies(Land& l){
           return false; // The pixel is blocked by a pixel which can't fall : we clearly won't be able to fall
         break;
         case GroupDependencyType_GROUP:
-          // The pixel's dependency is a group : if the group can't fall we return false, else we do nothing
-          if(l.p[(*it).second.pixelWeDependOn.first][(*it).second.pixelWeDependOn.second].group->resolveDependencies(l) == false){
-            canFallBool = false; // We can't fall
-            return false;
+          // The pixel's dependency is a group : if we can access the pixel it depends on
+          if(boost::shared_ptr<GroupPixel> grpPx = (*it)->pixelWeDependOn.lock()){
+            // If the group can't fall we return false, else we do nothing
+            if(l.p[grpPx->x][grpPx->y].group->resolveDependencies(l) == false){
+              canFallBool = false; // We can't fall
+              return false;
+            }
+          }
+          // Else, the pixel's dependency is nothing, since we can't access the pixel it should depend on..
+          else{
+            (*it)->depType = GroupDependencyType_NOTHING;
           }
         break;
       }
@@ -53,29 +60,44 @@ bool Group::canFall(){
 }
 
 Group* Group::registerPixel(int x, int y){
-  pixels[GroupPixel(x, y)].type = GroupDependencyType_NOTHING; // This new pixel has no dependency
-  pixels[GroupPixel(x, y)].aPixelDependsOnUs = false; // And no pixel depends on it
+  pixels.push_back(boost::shared_ptr<GroupPixel>(new GroupPixel(x, y)));
+  pixels.back()->depType = GroupDependencyType_NOTHING; // This new pixel has no dependency
+  pixels.back()->aPixelDependsOnUs = false; // And no pixel depends on it
   return this;
 }
 
-Group* Group::unregisterPixel(Land& l, int x, int y, bool removeTheDependencyLink){
+Group* Group::registerPixel(boost::shared_ptr<GroupPixel> grpPx){
+  pixels.push_back(grpPx);
+  return this;
+}
+
+Group* Group::unregisterPixel(int x, int y, bool removeTheDependencyLink){
+  // We first store the group pixel we should be working on
+  boost::shared_ptr<GroupPixel> groupPixelWeAreWorkingOn = getGroupPixelSharedPtr(x, y);
+  
   // If we are allowed to remove the dependency link (which must be done if the pixel really quit the group without entering a new one)
   if(removeTheDependencyLink){
-    // If a pixel depends on us, we must tell it that it doesn't depend on anything anymore
-    if(pixels[GroupPixel(x, y)].aPixelDependsOnUs){
-      l.p[pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.first][pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.second].group->
-        pixels[GroupPixel(pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.first, pixels[GroupPixel(x, y)].pixelWhichDependsOnUs.second)].type = GroupDependencyType_NOTHING;
+    // If a pixel depends on us
+    if(groupPixelWeAreWorkingOn->aPixelDependsOnUs){
+      // And we can access it
+      if(boost::shared_ptr<GroupPixel> pixelWhichDependsOnUs = groupPixelWeAreWorkingOn->pixelWhichDependsOnUs.lock()){
+        // We must tell it that it doesn't depend on anything anymore
+        pixelWhichDependsOnUs->depType = GroupDependencyType_NOTHING;
+      }
     }
 
-    // If we depend on a pixel, we must tell it that no pixel depend on it anymore
-    if(pixels[GroupPixel(x, y)].type == GroupDependencyType_GROUP){
-      l.p[pixels[GroupPixel(x, y)].pixelWeDependOn.first][pixels[GroupPixel(x, y)].pixelWeDependOn.second].group->
-        pixels[GroupPixel(pixels[GroupPixel(x, y)].pixelWeDependOn.first, pixels[GroupPixel(x, y)].pixelWeDependOn.second)].aPixelDependsOnUs = false;
+    // If we depend on a pixel
+    if(groupPixelWeAreWorkingOn->depType == GroupDependencyType_GROUP){
+      // And we can access it
+      if(boost::shared_ptr<GroupPixel> pixelWeDependOn = groupPixelWeAreWorkingOn->pixelWeDependOn.lock()){
+        // We must tell it that no pixel depend on it anymore
+        pixelWeDependOn->aPixelDependsOnUs = false;
+      }
     }
   }
 
   // Remove the pixel
-  pixels.erase(GroupPixel(x, y));
+  removePixel(x, y);
   
   // Return 0 (no pointer)
   return 0;
@@ -84,19 +106,16 @@ Group* Group::unregisterPixel(Land& l, int x, int y, bool removeTheDependencyLin
 void Group::checkForSplitting(Land& l){
   while(hasPixels()){ // While the group has pixels
     l.g.push_back(Group());
-    changePixelGroupRecursively(l, (*pixels.begin()).first.first, (*pixels.begin()).first.second, &l.g.back());
+    changePixelGroupRecursively(l, (*pixels.begin())->x, (*pixels.begin())->y, &l.g.back());
   }
 }
 
 void Group::changePixelGroupRecursively(Land& l, int x, int y, Group* newGroup){
-  // We register to the new group
-  l.p[x][y].group = newGroup->registerPixel(x, y);
-  
-  // We keep the dependency
-  newGroup->pixels[GroupPixel(x, y)] = pixels[GroupPixel(x, y)];
+  // We register to the new group by copying the old GroupPixel, it keeps the dependency
+  l.p[x][y].group = newGroup->registerPixel(getGroupPixelSharedPtr(x, y));
   
   // We unregister from the old group
-  unregisterPixel(l, x, y, false);
+  unregisterPixel(x, y, false);
   
   // And we try to also change adjacent pixels of our old group
   if(x < l.width-1 && l.p[x+1][y].group == this){
@@ -111,4 +130,31 @@ void Group::changePixelGroupRecursively(Land& l, int x, int y, Group* newGroup){
   if(y > 0 && l.p[x][y-1].group == this){
     changePixelGroupRecursively(l, x, y-1, newGroup);
   }
+}
+
+boost::shared_ptr<GroupPixel> Group::getGroupPixelSharedPtr(int x, int y){
+  for(std::list<boost::shared_ptr<GroupPixel> >::iterator it = pixels.begin(); it != pixels.end(); ++it){
+    if((*it)->x == x && (*it)->y == y)
+      return (*it);
+  }
+  
+  return boost::shared_ptr<GroupPixel>();
+}
+
+void Group::removePixel(int x, int y){
+  for(std::list<boost::shared_ptr<GroupPixel> >::iterator it = pixels.begin(); it != pixels.end(); ++it){
+    if((*it)->x == x && (*it)->y == y){
+      pixels.erase(it);
+      return;
+    }
+  }
+}
+
+GroupPixel::GroupPixel(){
+  
+}
+
+GroupPixel::GroupPixel(int _x, int _y){
+  x = _x;
+  y = _y;
 }
