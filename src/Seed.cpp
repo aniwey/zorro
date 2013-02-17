@@ -74,6 +74,7 @@ bool Seed::loop(Land& l){
       if(time > 60){
         step = seedStep_GROWING; // We move to the next step
         l.p[pixelX][pixelY].group = l.getPixelGroup()->registerPixel(pixelX, pixelY); // We create a group for us and our future leaves
+        l.notifyForUpdatingAroundThisPixel(pixelX, pixelY);
         time = 0; // And we reset time
       }
       // Else we increment the time spent planted

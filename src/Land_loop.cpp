@@ -1,9 +1,10 @@
 #include "Land.hpp"
 
 void Land::loop(){
-  //std::cout << "Groups : " << g.size() << std::endl;
+  /*
+  std::cout << "Groups : " << g.size() << std::endl;
   
-  /*int sum = 0;
+  int sum = 0;
   std::cout << "Areas to update : ";
   for(unsigned int i = 0; i < atuNotif.size(); ++i){
     sum += atuNotif[i].size();
@@ -13,16 +14,16 @@ void Land::loop(){
   }
   std::cout << sum << std::endl;
   
-  std::cout << std::endl;*/
+  std::cout << std::endl;
   
-  /*std::cout << "Groups : " << g.size() << std::endl;
+  std::cout << "Groups : " << g.size() << std::endl;
   
   int nb = 0;
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); ++it){
     std::cout << "         Group " << nb << std::endl;
-    for(std::map<GroupPixel, GroupDependency>::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); ++it2){
-      std::cout << "         " << (*it2).first.first << " " << (*it2).first.second << " : ";
-      switch((*it2).second.type){
+    for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); ++it2){
+      std::cout << "         " << (*it2)->x << " " << (*it2)->y << " : ";
+      switch((*it2)->depType){
         case GroupDependencyType_BOTTOM_OF_THE_MAP:
           std::cout << "bottom of the map";
         break;

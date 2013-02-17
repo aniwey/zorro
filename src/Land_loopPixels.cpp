@@ -116,7 +116,7 @@ void Land::loopPixels(){
     }
   }
   
-  //std::cout << g.size() << std::endl;
+  //std::cout << gtu.size() << std::endl;
   
   // Set the checked bool to false for every group
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
@@ -127,6 +127,13 @@ void Land::loopPixels(){
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups in gtu
     (*it).resolveDependencies(*this);
   }
+  
+  /*int a = 0;
+  std::cout << std::endl;
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups in gtu
+    if((*it).hasPixels()) std::cout << "Group " << a << " " << (*it).canFall() << std::endl;
+    a++;
+  }*/
     
   // Apply gravity on alone pixel & group pixels with no dependencies
   for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
@@ -155,14 +162,19 @@ void Land::loopPixels(){
 
   // Apply gravity on group pixels of all groups if gravity wasn't already applied on them just before
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups in 
-    if((*it).canFall()){ // If this group can fall
-      for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); it2++){ // Iteration over pixels in this group to update
-        if(p[(*it2)->x][(*it2)->y].feltAtThisFrame < frame_id){ // If this pixel didn't just felt
-          // We try to make it fall, if it felt, it means we unregistered it, so we must decrease iterator
-          if(tryToMakeFallAlongWithPixelsBelow((*it2)->x, (*it2)->y))
-            it2--;
+    if((*it).hasPixels() && (*it).canFall()){ // If this group can fall
+      bool modif;
+      do{
+        modif = false;
+        for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); it2++){ // Iteration over pixels in this group to update
+          if(p[(*it2)->x][(*it2)->y].feltAtThisFrame < frame_id){ // If this pixel didn't just felt
+            // We try to make it fall
+            tryToMakeFallAlongWithPixelsBelow((*it2)->x, (*it2)->y);
+            modif = true;
+            break;
+          }
         }
-      }
+      }while(modif == true);
     }
   }
   

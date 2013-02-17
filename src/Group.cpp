@@ -2,10 +2,6 @@
 
 #include "Land.hpp"
 
-Group::Group(){
-
-}
-
 bool Group::hasPixels(){
   return !pixels.empty();
 }
@@ -111,11 +107,11 @@ void Group::checkForSplitting(Land& l){
 }
 
 void Group::changePixelGroupRecursively(Land& l, int x, int y, Group* newGroup){
-  // We register to the new group by copying the old GroupPixel, it keeps the dependency
+  // We register to the new group by copying the old GroupPixel, in order to keep the dependency
   l.p[x][y].group = newGroup->registerPixel(getGroupPixelSharedPtr(x, y));
   
-  // We unregister from the old group
-  unregisterPixel(x, y, false);
+  // We remove the pixel from us
+  removePixel(x, y);
   
   // And we try to also change adjacent pixels of our old group
   if(x < l.width-1 && l.p[x+1][y].group == this){
@@ -133,17 +129,23 @@ void Group::changePixelGroupRecursively(Land& l, int x, int y, Group* newGroup){
 }
 
 boost::shared_ptr<GroupPixel> Group::getGroupPixelSharedPtr(int x, int y){
+  // We iterate over our pixels
   for(std::list<boost::shared_ptr<GroupPixel> >::iterator it = pixels.begin(); it != pixels.end(); ++it){
+    // If this is the ne we're searching for
     if((*it)->x == x && (*it)->y == y)
-      return (*it);
+      return (*it); // We return it
   }
   
+  // If we couldn't find the pixel we were searching for, we return a null shared_ptr
   return boost::shared_ptr<GroupPixel>();
 }
 
 void Group::removePixel(int x, int y){
+  // We iterate over our pixels
   for(std::list<boost::shared_ptr<GroupPixel> >::iterator it = pixels.begin(); it != pixels.end(); ++it){
+    // If this is the pixel we're searching for
     if((*it)->x == x && (*it)->y == y){
+      // We erase it and we return
       pixels.erase(it);
       return;
     }
