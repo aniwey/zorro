@@ -1,6 +1,7 @@
 #include "Screen.hpp"
 
 void Screen::writeLandToImage(Land& l){
+  /*
   Group* g1, *g2, *g3, *g4, *g5;
   std::list<Group>::iterator it;
   it = l.g.begin();
@@ -51,7 +52,7 @@ void Screen::writeLandToImage(Land& l){
       }
     }
   }
-  }/*
+  }*/
   
   // If we're not supposed to redraw everything at this loop, we only redraw areas just notified for updating
   if(l.redrawEverything == false){
@@ -62,7 +63,7 @@ void Screen::writeLandToImage(Land& l){
         }
       }
     }
-  }*/
+  }
   // Else, we redraw everything
   else{
     for(int i = 0; i < l.width; ++i){ // Iteration over the columns
