@@ -149,12 +149,3 @@ void Group::removePixel(int x, int y){
     }
   }
 }
-
-GroupPixel::GroupPixel(){
-  
-}
-
-GroupPixel::GroupPixel(int _x, int _y){
-  x = _x;
-  y = _y;
-}
