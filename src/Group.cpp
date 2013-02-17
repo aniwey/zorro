@@ -41,8 +41,7 @@ bool Group::resolveDependencies(Land& l){
       }
     }
     
-    // If finally we found no reason proving that we couldn't fall, we return true : we can fall !
-    canFallBool = true;
+    // If finally we found no reason proving that we couldn't fall, we let canFallBool to true and we return true : we can fall !
     return true;
   }
   // Else, we were already checked, we return our canFallBool
@@ -80,6 +79,8 @@ Group* Group::unregisterPixel(int x, int y, bool removeTheDependencyLink){
         // We must tell it that it doesn't depend on anything anymore
         pixelWhichDependsOnUs->depType = GroupDependencyType_NOTHING;
       }
+      // Else we can't access it : no pixel depends on us..
+      else groupPixelWeAreWorkingOn->aPixelDependsOnUs = false;
     }
 
     // If we depend on a pixel
@@ -89,6 +90,8 @@ Group* Group::unregisterPixel(int x, int y, bool removeTheDependencyLink){
         // We must tell it that no pixel depend on it anymore
         pixelWeDependOn->aPixelDependsOnUs = false;
       }
+      // Else we can't access it : we don't depend on a pixel anymore..
+      else groupPixelWeAreWorkingOn->depType = GroupDependencyType_NOTHING;
     }
   }
 

@@ -63,6 +63,12 @@ void Screen::handleEvents(Land& l, God& g, Interface& i, bool& exit){
           case sf::Keyboard::Space:
             activeAddingEvent = true;
           break;
+          case sf::Keyboard::O:
+            window.setFramerateLimit(60);
+          break;
+          case sf::Keyboard::L:
+            window.setFramerateLimit(1);
+          break;
           case sf::Keyboard::P: l.saveGame("./saves/test.txt"); break;
           case sf::Keyboard::M: l.loadGame("./saves/test.txt"); adaptToLand(l); break;
           default: // If we pressed any other letter

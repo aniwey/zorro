@@ -123,15 +123,31 @@ void Land::loopPixels(){
     (*it).checked = false;
   }
   
+  /*int a = 0;
+  std::cout << "before" << std::endl;
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
+    std::cout << std::endl;
+    if((*it).hasPixels()) std::cout << "Group " << a << " " << (*it).canFall() << std::endl;
+    for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); ++it2){
+      std::cout << (*it2)->x << " " << (*it2)->y << (*it2)->depType << std::endl;
+    }
+    a++;
+  }*/
+  
   // Resolve dependencies between groups, determine which one can fall and which one can't
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups in gtu
-    (*it).resolveDependencies(*this);
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
+    (*it).checked = false;
+    if((*it).hasPixels()) (*it).resolveDependencies(*this);
   }
   
-  /*int a = 0;
-  std::cout << std::endl;
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups in gtu
+  /*a = 0;
+  std::cout << "after" << std::endl;
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
+    std::cout << std::endl;
     if((*it).hasPixels()) std::cout << "Group " << a << " " << (*it).canFall() << std::endl;
+    for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); ++it2){
+      std::cout << (*it2)->x << " " << (*it2)->y << (*it2)->depType << std::endl;
+    }
     a++;
   }*/
     
@@ -161,7 +177,7 @@ void Land::loopPixels(){
   }
 
   // Apply gravity on group pixels of all groups if gravity wasn't already applied on them just before
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups in 
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
     if((*it).hasPixels() && (*it).canFall()){ // If this group can fall
       bool modif;
       do{
@@ -169,9 +185,10 @@ void Land::loopPixels(){
         for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); it2++){ // Iteration over pixels in this group to update
           if(p[(*it2)->x][(*it2)->y].feltAtThisFrame < frame_id){ // If this pixel didn't just felt
             // We try to make it fall
-            tryToMakeFallAlongWithPixelsBelow((*it2)->x, (*it2)->y);
-            modif = true;
-            break;
+            if(tryToMakeFallAlongWithPixelsBelow((*it2)->x, (*it2)->y)){
+              modif = true;
+              break;
+            }
           }
         }
       }while(modif == true);
@@ -205,10 +222,12 @@ bool Land::tryToMakeFallAlongWithPixelsBelow(int x, int y){
 
   // Calculate maxHeight (height to which we'll make pixels fall)
   for(maxHeight = y; maxHeight < height-1; ++maxHeight){
-    // If the pixel has no group but may not fall OR has a group but its group can't fall
+    // If the pixel has no group and may not fall OR has a group but its group can't fall OR already felt this frame
     if((p[x][maxHeight].group == 0 && pixelGravityVector[p[x][maxHeight].type] != pixelGravity_MAY_FALL)
         ||
-       (p[x][maxHeight].group != 0 && p[x][maxHeight].group->canFall() == false)){
+       (p[x][maxHeight].group != 0 && p[x][maxHeight].group->canFall() == false)
+        ||
+       (p[x][y].feltAtThisFrame == frame_id)){
       // We break the loop, since this pixel can't fall..
       break;
     }
