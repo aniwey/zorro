@@ -95,7 +95,7 @@ bool Seed::loop(Land& l){
     break;
     case seedStep_GROWING_WITH_FRUITS:
       if(time > 20){
-        growLeaves(l, pixelX, pixelY, false);
+        growLeaves(l, pixelX, pixelY, true);
         time = 0;
       }
       else{
