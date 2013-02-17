@@ -49,7 +49,7 @@ class Screen{
     ImageManager im;
     
     // Functions
-    void adaptToLand(Land&);
+    void adaptToLand(Land&, bool = false); // If the boolean is true, it means this is the first time we adapt to the land
     
   private:
     // Window

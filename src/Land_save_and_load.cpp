@@ -12,6 +12,7 @@ void Land::saveGame(std::string filename){
   oa.register_type<Fruit>();
   oa << width;
   oa << height;
+  oa << frame_id;
   oa << entities;
   oa << g;
   for(int i = 0; i < width; ++i){
@@ -29,6 +30,7 @@ void Land::loadGame(std::string filename){
   ia.register_type<Fruit>();
   ia >> width;
   ia >> height;
+  ia >> frame_id;
   ia >> entities;
   ia >> g;
   init(width, height); // Init land (resize the vector)
@@ -38,6 +40,6 @@ void Land::loadGame(std::string filename){
     }
   }
   
-  // Other stuff
-  frame_id = 0;
+  // We notify everything, in order to update every part of the screen
+  notifyEverything();
 }

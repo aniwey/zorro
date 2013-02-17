@@ -33,7 +33,7 @@ class Fruit:public Entity{
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int){
-      boost::serialization::base_object<Entity>(*this);
+      ar & boost::serialization::base_object<Entity>(*this);
       ar & step;
       ar & time;
       ar & dyingStep;

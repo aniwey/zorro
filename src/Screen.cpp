@@ -52,16 +52,18 @@ void Screen::init(ConfigData& mainConfig){
   
   // Mouse
   mousePosition = sf::Mouse::getPosition();
+  
+  // View zoom
+  viewZoom = 1;
 }
 
-void Screen::adaptToLand(Land& l){
+void Screen::adaptToLand(Land& l, bool firstTime){
   // Land view
   viewIdealCenter = sf::Vector2f(l.width/2, l.height/2);
-  view.setCenter(viewIdealCenter);
+  if(firstTime) view.setCenter(viewIdealCenter);
   viewIdealSize = sf::Vector2f(l.width, l.height);
-  view.setSize(width, height);
+  if(firstTime) view.setSize(width, height);
   window.setView(view);
-  viewZoom = 1;
   
   // Image size
   imageWidth = l.width;
@@ -73,10 +75,12 @@ void Screen::adaptToLand(Land& l){
   screenSprite.setTexture(screenTexture, true); // "true" allow the sprite to adapt itself to a change in the texture's size
   
   // Cursor
-  cursorPosition = getMouseCursorPosition();
-  correctCursorPosition();
-  createLandCursorPosition();
-  cursorIsUsedByTheInterface = false;
+  if(firstTime){
+    cursorPosition = getMouseCursorPosition();
+    correctCursorPosition();
+    createLandCursorPosition();
+    cursorIsUsedByTheInterface = false;
+  }
 }
 
 void Screen::changeZoom(float new_zoom){

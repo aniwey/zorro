@@ -9,6 +9,10 @@ void Land::switchAtuAndAtuNotif(){
     atuNotif[i].clear();
 }
 
+void Land::notifyEverything(){
+  notifyForUpdatingThisRectangle(0, 0, width-1, height-1);
+}
+
 void Land::notifyForUpdatingThisRectangle(int x1, int y1, int x2, int y2){
   bool areaWasAddedForThisColumn;
   

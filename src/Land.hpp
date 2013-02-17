@@ -55,6 +55,7 @@ class Land{
     void notifyForUpdatingThisRectangle(int, int, int, int);
     void notifyForUpdatingAroundThisPixel(int, int);
     void notifyForUpdatingThisPixel(int, int);
+    void notifyEverything();
     
     // Various tests on pixels
     std::vector<pixelGravity> pixelGravityVector;

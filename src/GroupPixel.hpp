@@ -46,6 +46,7 @@ class GroupPixel{
       ar & y;
       ar & depType;
       ar & pixelWeDependOn;
+      ar & aPixelDependsOnUs;
       ar & pixelWhichDependsOnUs;
     }
 };

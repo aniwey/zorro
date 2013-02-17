@@ -20,6 +20,7 @@ class Entity{
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int){
+      ar & last_frame_id;
       ar & pixelX;
       ar & pixelY;  
     }

@@ -23,7 +23,7 @@ void Pixel::create(pixelType _type, Land& l, int x, int y){
     type = _type;
     setColorBasedOnType();
     if(group != 0) group = group->unregisterPixel(x, y, true);
-    feltAtThisFrame = 0;
+    feltAtThisFrame = -1;
   }
 }
 
