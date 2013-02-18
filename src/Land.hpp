@@ -91,7 +91,7 @@ class Land{
       // loopPixels functions
       bool tryToMakeFall(int, int);
       bool tryToMakeFallAlongWithPixelsBelow(int, int);
-      bool makeFall(int, int);
+      void makeFall(int, int);
 };
 
 #endif

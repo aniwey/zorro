@@ -56,8 +56,8 @@ void Screen::writeLandToImage(Land& l){
   
   // If we're not supposed to redraw everything at this loop, we only redraw areas just notified for updating
   if(l.redrawEverything == false){
-    for(unsigned int i = 0; i < l.atuNotif.size(); ++i){ // Iteration over the columns
-      for(std::list<std::pair<int, int> >::iterator it = l.atuNotif[i].begin(); it != l.atuNotif[i].end(); it++){ // Iteration over areas in this column
+    for(unsigned int i = 0; i < l.atu.size(); ++i){ // Iteration over the columns
+      for(std::list<std::pair<int, int> >::iterator it = l.atu[i].begin(); it != l.atu[i].end(); it++){ // Iteration over areas in this column
         for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
           screenImage.setPixel(i, j, l.p[i][j].color);
         }

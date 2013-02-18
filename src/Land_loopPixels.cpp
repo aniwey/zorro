@@ -6,6 +6,8 @@ void Land::loopPixels(){
     (*it).checked = false;
   }
   
+  gtu.clear();
+  
   // If there's a pixel with a group in the areas to update, we add its group to gtu
   for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
     for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
@@ -21,25 +23,6 @@ void Land::loopPixels(){
   // We test splitting on every group in gtu  
   for(std::list<Group*>::iterator it = gtu.begin(); it != gtu.end(); it++){ // Iteration over groups to update
     (*it)->checkForSplitting(*this);
-  }
-  
-  gtu.clear();
-  
-  // Set the checked bool to false for every group
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
-    (*it).checked = false;
-  }
-  
-  // If there's a pixel with a group in the areas to update, we add its group to gtu
-  for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
-    for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
-      for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
-        if(p[i][j].group != 0 && p[i][j].group->checked == false){ // If this pixel has a group which isn't already checked
-          gtu.push_back(p[i][j].group); // We add this group to gtu
-          p[i][j].group->checked = true; // And we check it
-        }
-      }
-    }
   }
     
   // Update dependencies of group pixels in the areas to update
@@ -198,9 +181,6 @@ void Land::loopPixels(){
   // Dirt loop
   loopDirt();
     
-  // We clear gtu
-  gtu.clear();
-    
   // We destroy all groups with no pixels
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
     if((*it).hasPixels() == false){ // If the group has no pixels
@@ -211,8 +191,10 @@ void Land::loopPixels(){
 }
 
 bool Land::tryToMakeFall(int x, int y){
-  if(pixelPhysicalStateVector[p[x][y+1].type] == pixelPhysicalState_GASEOUS){ // If the pixel below is gaseous
-    return makeFall(x, y);
+  if(pixelPhysicalStateVector[p[x][y+1].type] == pixelPhysicalState_GASEOUS && // If the pixel below is gaseous
+     ((p[x][y].group != 0 && p[x][y].group->canFall()) || pixelGravityVector[p[x][y].type] == pixelGravity_MAY_FALL)){ // And the pixel has a group which can fall OR has no group but may fall
+    makeFall(x, y);
+    return true;
   }
   return false;
 }
@@ -244,38 +226,28 @@ bool Land::tryToMakeFallAlongWithPixelsBelow(int x, int y){
   return false;
 }
 
-bool Land::makeFall(int x, int y){
+void Land::makeFall(int x, int y){
   if(p[x][y].group == 0){ // If we don't belong to a group
-    if(pixelGravityVector[p[x][y].type] == pixelGravity_MAY_FALL){ // If we can fall
-      // Then we swap with the pixel below
-      swap(p[x][y], p[x][y+1]);
-      // We tell the pixel that he moved
-      p[x][y+1].youJustMovedTo(x, y+1);
-      // We set that it felt at this frame
-      p[x][y+1].feltAtThisFrame = frame_id;
-      // And we notify that the area will have to be updated
-      notifyForUpdatingThisRectangle(x-1, y-1, x+1, y+2);
-      // We return
-      return true;
-    }
+    // Then we swap with the pixel below
+    swap(p[x][y], p[x][y+1]);
+    // We tell the pixel that he moved
+    p[x][y+1].youJustMovedTo(x, y+1);
+    // We set that it felt at this frame
+    p[x][y+1].feltAtThisFrame = frame_id;
+    // And we notify that the area will have to be updated
+    notifyForUpdatingThisRectangle(x-1, y-1, x+1, y+2);
   }
   else{ // Else, we belong to a group
-    if(p[x][y].group->canFall()){ // If our group can fall
-      // Then we swap with the pixel below
-      swap(p[x][y], p[x][y+1]);
-      // We tell the pixel that he moved
-      p[x][y+1].youJustMovedTo(x, y+1);
-      // We unregister the old pixel and register the new one, so that our group can track us
-      p[x][y+1].group->unregisterPixel(x, y, true);
-      p[x][y+1].group->registerPixel(x, y+1);
-      // We set that it felt at this frame
-      p[x][y+1].feltAtThisFrame = frame_id;
-      // And we notify that the area will have to be updated
-      notifyForUpdatingThisRectangle(x-1, y-1, x+1, y+2);
-      // We return
-      return true;
-    }
+    // Then we swap with the pixel below
+    swap(p[x][y], p[x][y+1]);
+    // We tell the pixel that he moved
+    p[x][y+1].youJustMovedTo(x, y+1);
+    // We unregister the old pixel and register the new one, so that our group can track us
+    p[x][y+1].group->unregisterPixel(x, y, true);
+    p[x][y+1].group->registerPixel(x, y+1);
+    // We set that it felt at this frame
+    p[x][y+1].feltAtThisFrame = frame_id;
+    // And we notify that the area will have to be updated
+    notifyForUpdatingThisRectangle(x-1, y-1, x+1, y+2);
   }
-  
-  return false;
 }

@@ -23,7 +23,7 @@ int main(void){
   
   // Create the land object
   Land l;
-  l.newGame(s.getWidth()/4 - 20, s.getHeight()/4 - 20);
+  l.newGame(s.getWidth() - 20, s.getHeight() - 20);
   s.adaptToLand(l, true);
   
   // Create the interface object
@@ -36,10 +36,10 @@ int main(void){
   
   while(!exit){
     l.switchAtuAndAtuNotif();
+    s.draw(l, g, i);
     l.loop();
     s.handleEvents(l, g, i, exit);
     i.loop();
-    s.draw(l, g, i);
   }
   
   return 0;
