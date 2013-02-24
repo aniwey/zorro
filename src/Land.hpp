@@ -38,12 +38,16 @@ class Land{
     void writePixelLine(int x1, int y1, int x2, int y2, pixelType type);
     void writeSinglePixel(int x, int y, pixelType type);
     
-    // Pixel array
-    std::vector<std::vector<Pixel> > p;
+    // Pixels
+    std::vector<std::vector<Pixel> > p; // Pixels array
     
-    // Pixel groups stuff
+    // Groups
     std::list<Group> g; // Groups list
-    Group* getPixelGroup();
+    Group* getPixelGroup(); // Create a new group and return a pointer to it
+    
+    // Entities
+    std::list<boost::weak_ptr<Entity> > entities; // List of entities (weak_ptr, see boost::weak_ptr)
+    void registerEntity(boost::shared_ptr<Entity>); // Register a new entities to the entities list using a shared_ptr to an entity, the shared_ptr probably being contained in a pixel
     
     // Updating
     std::vector<std::list<std::pair<int, int> > > atu; // Areas to update used during the pixels loop
@@ -73,10 +77,6 @@ class Land{
     // Serialization
     void saveGame(std::string);
     void loadGame(std::string);
-    
-    // Entities
-    std::list<boost::weak_ptr<Entity> > entities;
-    void registerEntity(boost::shared_ptr<Entity>);
     
     // Bool to redraw everything
     bool redrawEverything;
