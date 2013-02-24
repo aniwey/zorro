@@ -104,24 +104,35 @@ void Land::loopPixels(){
       int bottom = (*it).first;
       if(bottom > height-1) bottom = height-1;
       
-      // Iteration over pixels in the area
-      for(int j = bottom; j >= (*it).second; --j){
-        tryToMakeFallAlongWithPixelsBelow(i, j);
+      // We try to make fall the very first pixel of the area, along with pixels below it
+      tryToMakeFallAlongWithPixelsBelow(i, bottom);
+      
+      // We try to make fall every pixel in the area, EXCEPT the very first and the very last pixel
+      for(int j = bottom - 1; j > (*it).second; --j){
+        tryToMakeFall(i, j);
       }
       
-      // Here, we have updated every pixels in our area. But maybe updating them just allowed for above pixels to be updated too !
-      // That's why we now try to make fall every above pixels until we reach either the top of the map or the beginning or the next area
-      // We first set the y position where we'll stop (top of the land or beginning of the next area)
-      int yStop;
-      std::list<std::pair<int, int> >::iterator nextArea = it;
-      nextArea++;
-      if(nextArea == atu[i].end()) // If we were working on the last area, then yStop equals the top of the land
-        yStop = 0;
-      else // Else, yStop equals just before the beginning of the next area
-        yStop = (*nextArea).first + 1;
-      // Then, we try to make fall any pixel above until we reach yStop or until we don't make fall anything
-      for(int j = (*it).second - 1; j >= yStop; --j){
-        if(tryToMakeFall(i, j) == false) break;
+      // We try to make fall the very last pixel, and we save the return value : true if it felt, false otherwise
+      bool theVeryLastPixelFelt = tryToMakeFall(i, (*it).second);
+      
+      // Here, we have made fall every pixel in the area which was able to fall. But if we made fall the very last pixel, maybe it allowed for above pixels to fall to ?
+      if(theVeryLastPixelFelt){
+        // That's why we now try to make fall every above pixels until we reach either the top of the map or the beginning or the next area
+        // We first set the y position where we'll stop (top of the land or beginning of the next area)
+        int yStop;
+        std::list<std::pair<int, int> >::iterator nextArea = it;
+        nextArea++;
+        if(nextArea == atu[i].end()) // If we were working on the last area, then yStop equals the top of the land
+          yStop = 0;
+        else // Else, yStop equals just before the beginning of the next area
+          yStop = (*nextArea).first + 1;
+        
+        // Then, we try to make fall any pixel above until we reach yStop or until we don't make fall anything
+        for(int j = (*it).second - 1; j >= yStop; --j){
+          if(tryToMakeFall(i, j) == false){ // If we don't make fall anything
+            break; // We break;
+          }
+        }
       }
     }
   }
