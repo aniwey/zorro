@@ -1,28 +1,9 @@
 #include "Land.hpp"
 
-void Land::loopPixels(){
+void Land::loopPixels(){  
   // Set the checked bool to false for every group
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
     (*it).checked = false;
-  }
-  
-  gtu.clear();
-  
-  // If there's a pixel with a group in the areas to update, we add its group to gtu
-  for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
-    for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
-      for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
-        if(p[i][j].group != 0 && p[i][j].group->checked == false){ // If this pixel has a group which isn't already checked
-          gtu.push_back(p[i][j].group); // We add this group to gtu
-          p[i][j].group->checked = true; // And we check it
-        }
-      }
-    }
-  }
-  
-  // We test splitting on every group in gtu
-  for(std::list<Group*>::iterator it = gtu.begin(); it != gtu.end(); it++){ // Iteration over groups to update
-    (*it)->checkForSplitting(*this);
   }
     
   // Update dependencies of group pixels in the areas to update
@@ -30,6 +11,12 @@ void Land::loopPixels(){
     for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
       for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
         if(p[i][j].group != 0){ // If this pixel has a group
+          // If the group wasn't checked already
+          if(p[i][j].group->checked == false){
+            p[i][j].group->checked = true; // It's checked now
+            p[i][j].group->checkForSplitting(*this); // And we check for splitting
+          }
+        
           // We get the group pixel corresponding to the pixel and we save it for future operations
           boost::shared_ptr<GroupPixel> groupPixelWeAreWorkingOn = p[i][j].group->getGroupPixelSharedPtr(i, j);
         
@@ -113,11 +100,15 @@ void Land::loopPixels(){
   // Apply gravity on alone pixel & group pixels with no dependencies
   for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
     for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
-      for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
-        if(j < height-1){ // If we're not at the bottom of the land
-          tryToMakeFallAlongWithPixelsBelow(i, j);
-        }
+      // We search the correct bottom of the area : it's in fact (*it).first, unless the area begins at the bottom of the land, in which case we take height-1 as the real bottom
+      int bottom = (*it).first;
+      if(bottom > height-1) bottom = height-1;
+      
+      // Iteration over pixels in the area
+      for(int j = bottom; j >= (*it).second; --j){
+        tryToMakeFallAlongWithPixelsBelow(i, j);
       }
+      
       // Here, we have updated every pixels in our area. But maybe updating them just allowed for above pixels to be updated too !
       // That's why we now try to make fall every above pixels until we reach either the top of the map or the beginning or the next area
       // We first set the y position where we'll stop (top of the land or beginning of the next area)

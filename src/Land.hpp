@@ -43,7 +43,6 @@ class Land{
     
     // Pixel groups stuff
     std::list<Group> g; // Groups list
-    std::list<Group*> gtu; // Groups to update
     Group* getPixelGroup();
     
     // Updating
