@@ -1,6 +1,122 @@
 #include "Land.hpp"
 
 void Land::loopPixels(){  
+  checkForGroupsSplittingAndUpdateDependencies();
+  resolveDependenciesBetweenGroups();
+  applyGravityOnAtu();
+  applyGravityOnGroupsOutsideAtu();
+  loopDirt();
+  destroyEmptyGroups();
+}
+
+void Land::destroyEmptyGroups(){
+  // We destroy all groups with no pixels
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
+    if((*it).hasPixels() == false){ // If the group has no pixels
+      g.erase(it);
+      it--;
+    }
+  }
+}
+
+void Land::applyGravityOnGroupsOutsideAtu(){
+  // Apply gravity on group pixels of all groups if gravity wasn't already applied on them just before
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
+    if((*it).hasPixels() && (*it).canFall()){ // If this group can fall
+      bool modif;
+      do{
+        modif = false;
+        for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); it2++){ // Iteration over pixels in this group to update
+          if(p[(*it2)->x][(*it2)->y].feltAtThisFrame < frame_id){ // If this pixel didn't just felt
+            // We try to make it fall
+            if(tryToMakeFallAlongWithPixelsBelow((*it2)->x, (*it2)->y)){
+              modif = true;
+              break;
+            }
+          }
+        }
+      }while(modif == true);
+    }
+  }
+}
+
+void Land::applyGravityOnAtu(){
+  // Apply gravity on alone pixel & group pixels with no dependencies
+  for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
+    for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
+      // We search the correct bottom of the area : it's in fact (*it).first, unless the area begins at the bottom of the land, in which case we take height-1 as the real bottom
+      int bottom = (*it).first;
+      if(bottom > height-1) bottom = height-1;
+      
+      // We try to make fall the very first pixel of the area, along with pixels below it
+      tryToMakeFallAlongWithPixelsBelow(i, bottom);
+      
+      // We try to make fall every pixel in the area, EXCEPT the very first and the very last pixel
+      bool aPixelFelt = false;
+      int heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt;
+      for(int j = bottom - 1; j > (*it).second; --j){
+        if(tryToMakeFall(i, j)){ // If the pixel felt
+          if(aPixelFelt == false){ // And no pixel already felt
+            aPixelFelt = true; // Now a pixel felt
+            heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt = j; // And we save its position
+          }
+        }
+        else{ // The pixel didn't felt
+          if(aPixelFelt){ // If a pixel already felt before
+            aPixelFelt = false; // Now no pixel felt
+            notifyForUpdatingThisRectangle(i-1, j, i+1, heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt+2); // We notify
+          }
+        }
+      }
+      if(aPixelFelt) // If a pixel felt and we didn't notify, we do it now
+        notifyForUpdatingThisRectangle(i-1, (*it).second, i+1, heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt+2);
+      
+      // We try to make fall the very last pixel, and we save the return value : true if it felt, false otherwise
+      bool theVeryLastPixelFelt = tryToMakeFall(i, (*it).second);
+      if(theVeryLastPixelFelt) notifyForUpdatingAroundThisPixel(i, (*it).second); // If it felt, we notify
+      
+      // Here, we have made fall every pixel in the area which was able to fall. But if we made fall the very last pixel, maybe it allowed for above pixels to fall to ?
+      if(theVeryLastPixelFelt){
+        // That's why we now try to make fall every above pixels until we reach either the top of the map or the beginning or the next area
+        // We first set the y position where we'll stop (top of the land or beginning of the next area)
+        int yStop;
+        std::list<std::pair<int, int> >::iterator nextArea = it;
+        nextArea++;
+        if(nextArea == atu[i].end()) // If we were working on the last area, then yStop equals the top of the land
+          yStop = 0;
+        else // Else, yStop equals just before the beginning of the next area
+          yStop = (*nextArea).first + 1;
+        
+        // Then, we try to make fall any pixel above until we reach yStop or until we don't make fall anything
+        for(int j = (*it).second - 1; j >= yStop; --j){
+          if(tryToMakeFall(i, j) == false){ // If we don't make fall anything
+            // We notify
+            notifyForUpdatingThisRectangle(i-1, j, i+1, (*it).second+1);
+            // We break
+            break;
+          }
+        }
+        // If we're here, it meanes we reached yStop : we notify
+        notifyForUpdatingThisRectangle(i-1, yStop-1, i+1, (*it).second+1);
+      }
+    }
+  }
+}
+
+void Land::resolveDependenciesBetweenGroups(){
+  // Set the checked bool to false for every group
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
+    (*it).checked = false;
+  }
+  
+  // Resolve dependencies between groups, determine which one can fall and which one can't
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
+    (*it).checked = false;
+    if((*it).hasPixels()) (*it).resolveDependencies(*this);
+  }
+}
+
+void Land::checkForGroupsSplittingAndUpdateDependencies(){
   // Set the checked bool to false for every group
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
     (*it).checked = false;
@@ -83,108 +199,6 @@ void Land::loopPixels(){
           }
         }
       }
-    }
-  }
-  
-  // Set the checked bool to false for every group
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
-    (*it).checked = false;
-  }
-  
-  // Resolve dependencies between groups, determine which one can fall and which one can't
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
-    (*it).checked = false;
-    if((*it).hasPixels()) (*it).resolveDependencies(*this);
-  }
-    
-  // Apply gravity on alone pixel & group pixels with no dependencies
-  for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
-    for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
-      // We search the correct bottom of the area : it's in fact (*it).first, unless the area begins at the bottom of the land, in which case we take height-1 as the real bottom
-      int bottom = (*it).first;
-      if(bottom > height-1) bottom = height-1;
-      
-      // We try to make fall the very first pixel of the area, along with pixels below it
-      tryToMakeFallAlongWithPixelsBelow(i, bottom);
-      
-      // We try to make fall every pixel in the area, EXCEPT the very first and the very last pixel
-      bool aPixelFelt = false;
-      int heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt;
-      for(int j = bottom - 1; j > (*it).second; --j){
-        if(tryToMakeFall(i, j)){ // If the pixel felt
-          if(aPixelFelt == false){ // And no pixel already felt
-            aPixelFelt = true; // Now a pixel felt
-            heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt = j; // And we save its position
-          }
-        }
-        else{ // The pixel didn't felt
-          if(aPixelFelt){ // If a pixel already felt before
-            aPixelFelt = false; // Now no pixel felt
-            notifyForUpdatingThisRectangle(i-1, j, i+1, heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt+2); // We notify
-          }
-        }
-      }
-      if(aPixelFelt) // If a pixel felt and we didn't notify, we do it now
-        notifyForUpdatingThisRectangle(i-1, (*it).second, i+1, heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt+2);
-      
-      // We try to make fall the very last pixel, and we save the return value : true if it felt, false otherwise
-      bool theVeryLastPixelFelt = tryToMakeFall(i, (*it).second);
-      if(theVeryLastPixelFelt) notifyForUpdatingAroundThisPixel(i, (*it).second); // If it felt, we notify
-      
-      // Here, we have made fall every pixel in the area which was able to fall. But if we made fall the very last pixel, maybe it allowed for above pixels to fall to ?
-      if(theVeryLastPixelFelt){
-        // That's why we now try to make fall every above pixels until we reach either the top of the map or the beginning or the next area
-        // We first set the y position where we'll stop (top of the land or beginning of the next area)
-        int yStop;
-        std::list<std::pair<int, int> >::iterator nextArea = it;
-        nextArea++;
-        if(nextArea == atu[i].end()) // If we were working on the last area, then yStop equals the top of the land
-          yStop = 0;
-        else // Else, yStop equals just before the beginning of the next area
-          yStop = (*nextArea).first + 1;
-        
-        // Then, we try to make fall any pixel above until we reach yStop or until we don't make fall anything
-        for(int j = (*it).second - 1; j >= yStop; --j){
-          if(tryToMakeFall(i, j) == false){ // If we don't make fall anything
-            // We notify
-            notifyForUpdatingThisRectangle(i-1, j, i+1, (*it).second+1);
-            // We break
-            break;
-          }
-        }
-        // If we're here, it meanes we reached yStop : we notify
-        notifyForUpdatingThisRectangle(i-1, yStop-1, i+1, (*it).second+1);
-      }
-    }
-  }
-
-  // Apply gravity on group pixels of all groups if gravity wasn't already applied on them just before
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
-    if((*it).hasPixels() && (*it).canFall()){ // If this group can fall
-      bool modif;
-      do{
-        modif = false;
-        for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); it2++){ // Iteration over pixels in this group to update
-          if(p[(*it2)->x][(*it2)->y].feltAtThisFrame < frame_id){ // If this pixel didn't just felt
-            // We try to make it fall
-            if(tryToMakeFallAlongWithPixelsBelow((*it2)->x, (*it2)->y)){
-              modif = true;
-              break;
-            }
-          }
-        }
-      }while(modif == true);
-    }
-  }
-
-  // Dirt loop
-  loopDirt();
-    
-  // We destroy all groups with no pixels
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
-    if((*it).hasPixels() == false){ // If the group has no pixels
-      g.erase(it);
-      it--;
     }
   }
 }

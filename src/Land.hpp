@@ -85,8 +85,12 @@ class Land{
     // loop() steps
     void loopPixels();
       // loopPixels() functions
-      void updateGtuAndCheckForGroupSplitting();
+      void checkForGroupsSplittingAndUpdateDependencies();
+      void resolveDependenciesBetweenGroups();
+      void applyGravityOnAtu();
+      void applyGravityOnGroupsOutsideAtu();
       void loopDirt();
+      void destroyEmptyGroups();
     void loopEntities();
     
     // Falling functions used by loopPixels functions

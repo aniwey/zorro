@@ -34,7 +34,7 @@ void Land::loopDirt(){
               j = l;
             }
             // If the pixel does not touch the right side of the screen and the pixel on its right is gaseous
-            else if((int)i != width-1 && pixelPhysicalStateVector[p[i+1][j].type] == pixelPhysicalState_GASEOUS){
+            else if(i != width-1 && pixelPhysicalStateVector[p[i+1][j].type] == pixelPhysicalState_GASEOUS){
               // We move the pixel to the right
               swap(p[i][j], p[i+1][j]);
               // We tell it that it felt
