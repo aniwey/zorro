@@ -108,12 +108,28 @@ void Land::loopPixels(){
       tryToMakeFallAlongWithPixelsBelow(i, bottom);
       
       // We try to make fall every pixel in the area, EXCEPT the very first and the very last pixel
+      bool aPixelFelt = false;
+      int heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt;
       for(int j = bottom - 1; j > (*it).second; --j){
-        tryToMakeFall(i, j);
+        if(tryToMakeFall(i, j)){ // If the pixel felt
+          if(aPixelFelt == false){ // And no pixel already felt
+            aPixelFelt = true; // Now a pixel felt
+            heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt = j; // And we save its position
+          }
+        }
+        else{ // The pixel didn't felt
+          if(aPixelFelt){ // If a pixel already felt before
+            aPixelFelt = false; // Now no pixel felt
+            notifyForUpdatingThisRectangle(i-1, j, i+1, heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt+2); // We notify
+          }
+        }
       }
+      if(aPixelFelt) // If a pixel felt and we didn't notify, we do it now
+        notifyForUpdatingThisRectangle(i-1, (*it).second, i+1, heightOfTheFirstPixelOfThisFallingSuccessionWhichFelt+2);
       
       // We try to make fall the very last pixel, and we save the return value : true if it felt, false otherwise
       bool theVeryLastPixelFelt = tryToMakeFall(i, (*it).second);
+      if(theVeryLastPixelFelt) notifyForUpdatingAroundThisPixel(i, (*it).second); // If it felt, we notify
       
       // Here, we have made fall every pixel in the area which was able to fall. But if we made fall the very last pixel, maybe it allowed for above pixels to fall to ?
       if(theVeryLastPixelFelt){
@@ -130,9 +146,14 @@ void Land::loopPixels(){
         // Then, we try to make fall any pixel above until we reach yStop or until we don't make fall anything
         for(int j = (*it).second - 1; j >= yStop; --j){
           if(tryToMakeFall(i, j) == false){ // If we don't make fall anything
-            break; // We break;
+            // We notify
+            notifyForUpdatingThisRectangle(i-1, j, i+1, (*it).second+1);
+            // We break
+            break;
           }
         }
+        // If we're here, it meanes we reached yStop : we notify
+        notifyForUpdatingThisRectangle(i-1, yStop-1, i+1, (*it).second+1);
       }
     }
   }
@@ -193,39 +214,38 @@ bool Land::tryToMakeFallAlongWithPixelsBelow(int x, int y){
     }
   }
   
-  // Make fall pixels from y to maxHeight-1 if there's a gaseous pixel at maxHeight
+  // If there's a gaseous pixel at maxHeight
   if(pixelPhysicalStateVector[p[x][maxHeight].type] == pixelPhysicalState_GASEOUS){
+    // Make fall pixels from y to maxHeight-1
     for(int j = maxHeight-1; j >= y; --j){
       makeFall(x, j);
     }
-    return true;
+    
+    // If we made fall at least one pixel
+    if(maxHeight-1 >= y){
+      // Notify
+      notifyForUpdatingThisRectangle(x-1, y-1, x+1, maxHeight+1);
+    
+      // Return true
+      return true;
+    }
   }
   
   return false;
 }
 
 void Land::makeFall(int x, int y){
-  if(p[x][y].group == 0){ // If we don't belong to a group
-    // Then we swap with the pixel below
-    swap(p[x][y], p[x][y+1]);
-    // We tell the pixel that he moved
-    p[x][y+1].youJustMovedTo(x, y+1);
-    // We set that it felt at this frame
-    p[x][y+1].feltAtThisFrame = frame_id;
-    // And we notify that the area will have to be updated
-    notifyForUpdatingThisRectangle(x-1, y-1, x+1, y+2);
-  }
-  else{ // Else, we belong to a group
-    // Then we swap with the pixel below
-    swap(p[x][y], p[x][y+1]);
-    // We tell the pixel that he moved
-    p[x][y+1].youJustMovedTo(x, y+1);
+  // We swap with the pixel below
+  swap(p[x][y], p[x][y+1]);
+  // We tell the pixel that it moved
+  p[x][y+1].youJustMovedTo(x, y+1);
+  // We set that it felt at this frame
+  p[x][y+1].feltAtThisFrame = frame_id;
+  
+  // And if we belong to a group..
+  if(p[x][y+1].group != 0){
     // We unregister the old pixel and register the new one, so that our group can track us
     p[x][y+1].group->unregisterPixel(x, y, true);
     p[x][y+1].group->registerPixel(x, y+1);
-    // We set that it felt at this frame
-    p[x][y+1].feltAtThisFrame = frame_id;
-    // And we notify that the area will have to be updated
-    notifyForUpdatingThisRectangle(x-1, y-1, x+1, y+2);
   }
 }
