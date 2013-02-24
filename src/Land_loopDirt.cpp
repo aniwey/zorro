@@ -9,9 +9,9 @@ void Land::loopDirt(){
   //   This causes a problem! Pixels falling on the right side of a dirt pyramid will be teleported down.. That's why we have to study pixels in this order :
   //     0, 2, 4, 6, 1, 3, 5 (even numbers first, odd numbers after, it could be inversed without problem)
   //   That's what i is for in the for loop (pun intended haha)
-  for(int k = 0; k < width; k++){
+  for(unsigned int k = 0; k < atu.size(); k++){
     // Set i
-    if(k < (width+1)/2) i = k*2;
+    if((int)k < (width+1)/2) i = k*2;
     else i = (k - (width+1)/2)*2 + 1;
     for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
       for(j = (*it).first; j >= (*it).second; --j){
@@ -23,6 +23,8 @@ void Land::loopDirt(){
             if(i != 0 && pixelPhysicalStateVector[p[i-1][j].type] == pixelPhysicalState_GASEOUS){
               // We move the pixel to the left
               swap(p[i][j], p[i-1][j]);
+              // We tell it that it felt
+              p[i-1][j].feltAtThisFrame = frame_id;
               // We notify
               notifyForUpdatingThisRectangle(i-2, j-1, i+1, j+2);
               // We move all the dirt pixels above
@@ -32,9 +34,11 @@ void Land::loopDirt(){
               j = l;
             }
             // If the pixel does not touch the right side of the screen and the pixel on its right is gaseous
-            else if(i != width-1 && pixelPhysicalStateVector[p[i+1][j].type] == pixelPhysicalState_GASEOUS){
+            else if((int)i != width-1 && pixelPhysicalStateVector[p[i+1][j].type] == pixelPhysicalState_GASEOUS){
               // We move the pixel to the right
               swap(p[i][j], p[i+1][j]);
+              // We tell it that it felt
+              p[i+1][j].feltAtThisFrame = frame_id;
               // We notify
               notifyForUpdatingThisRectangle(i-1, j-1, i+2, j+2);
               // We move all the dirt pixels above
