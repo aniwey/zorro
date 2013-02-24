@@ -6,7 +6,7 @@ void Land::loopDirt(){
   // What's the thing with k and i?! What don't we just use k?
   //   Imagine width = 7, for example. If we just use k, then we'll study columns in this order :
   //     0, 1, 2, 3, 4, 5, 6
-  //   This causes a problem! Pixels falling on the right side of a dirt pyramid will be teleported down.. That's why we have to study pixels in this order :
+  //   This causes a problem! Pixels falling on the left side of a dirt pyramid won't act the same way as pixels falling on its right side. That's why we have to study pixels in this order :
   //     0, 2, 4, 6, 1, 3, 5 (even numbers first, odd numbers after, it could be inversed without problem)
   //   That's what i is for in the for loop (pun intended haha)
   for(unsigned int k = 0; k < atu.size(); k++){
