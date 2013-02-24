@@ -2,6 +2,10 @@
 
 #include "Land.hpp"
 
+Group::Group(){
+
+}
+
 bool Group::hasPixels(){
   return !pixels.empty();
 }

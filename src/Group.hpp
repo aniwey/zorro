@@ -14,7 +14,7 @@ class Land;
 class Group{
   public:
     // Constructor
-    Group(){ };
+    Group();
   
     // Pixel registering and unregistering
     

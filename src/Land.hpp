@@ -83,15 +83,17 @@ class Land{
     bool redrawEverything;
 
   private:
-    // Loop steps
-    void loopDirt();
-    void loopGravity();
-    void loopEntities();
+    // loop() steps
     void loopPixels();
-      // loopPixels functions
-      bool tryToMakeFall(int, int);
-      bool tryToMakeFallAlongWithPixelsBelow(int, int);
-      void makeFall(int, int);
+      // loopPixels() functions
+      void updateGtuAndCheckForGroupSplitting();
+      void loopDirt();
+    void loopEntities();
+    
+    // Falling functions used by loopPixels functions
+    bool tryToMakeFall(int, int);
+    bool tryToMakeFallAlongWithPixelsBelow(int, int);
+    void makeFall(int, int);
 };
 
 #endif

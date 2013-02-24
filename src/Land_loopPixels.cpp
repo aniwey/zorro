@@ -20,7 +20,7 @@ void Land::loopPixels(){
     }
   }
   
-  // We test splitting on every group in gtu  
+  // We test splitting on every group in gtu
   for(std::list<Group*>::iterator it = gtu.begin(); it != gtu.end(); it++){ // Iteration over groups to update
     (*it)->checkForSplitting(*this);
   }
@@ -99,40 +99,16 @@ void Land::loopPixels(){
     }
   }
   
-  //std::cout << gtu.size() << std::endl;
-  
   // Set the checked bool to false for every group
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
     (*it).checked = false;
   }
-  
-  /*int a = 0;
-  std::cout << "before" << std::endl;
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
-    std::cout << std::endl;
-    if((*it).hasPixels()) std::cout << "Group " << a << " " << (*it).canFall() << std::endl;
-    for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); ++it2){
-      std::cout << (*it2)->x << " " << (*it2)->y << (*it2)->depType << std::endl;
-    }
-    a++;
-  }*/
   
   // Resolve dependencies between groups, determine which one can fall and which one can't
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
     (*it).checked = false;
     if((*it).hasPixels()) (*it).resolveDependencies(*this);
   }
-  
-  /*a = 0;
-  std::cout << "after" << std::endl;
-  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
-    std::cout << std::endl;
-    if((*it).hasPixels()) std::cout << "Group " << a << " " << (*it).canFall() << std::endl;
-    for(std::list<boost::shared_ptr<GroupPixel> >::iterator it2 = (*it).pixels.begin(); it2 != (*it).pixels.end(); ++it2){
-      std::cout << (*it2)->x << " " << (*it2)->y << (*it2)->depType << std::endl;
-    }
-    a++;
-  }*/
     
   // Apply gravity on alone pixel & group pixels with no dependencies
   for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
@@ -192,7 +168,7 @@ void Land::loopPixels(){
 
 bool Land::tryToMakeFall(int x, int y){
   if(pixelPhysicalStateVector[p[x][y+1].type] == pixelPhysicalState_GASEOUS && // If the pixel below is gaseous
-     ((p[x][y].group != 0 && p[x][y].group->canFall()) || pixelGravityVector[p[x][y].type] == pixelGravity_MAY_FALL)){ // And the pixel has a group which can fall OR has no group but may fall
+     ((p[x][y].group != 0 && p[x][y].group->canFall()) || (p[x][y].group == 0 && pixelGravityVector[p[x][y].type] == pixelGravity_MAY_FALL))){ // And the pixel has a group which can fall OR has no group but may fall
     makeFall(x, y);
     return true;
   }
