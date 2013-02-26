@@ -6,6 +6,7 @@ void Land::loopPixels(){
   applyGravityOnAtu();
   applyGravityOnGroupsOutsideAtu();
   loopDirt();
+  loopWater();
   destroyEmptyGroups();
 }
 

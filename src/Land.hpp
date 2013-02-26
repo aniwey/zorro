@@ -90,6 +90,7 @@ class Land{
       void applyGravityOnAtu();
       void applyGravityOnGroupsOutsideAtu();
       void loopDirt();
+      void loopWater();
       void destroyEmptyGroups();
     void loopEntities();
     
@@ -97,6 +98,9 @@ class Land{
     bool tryToMakeFall(int, int);
     bool tryToMakeFallAlongWithPixelsBelow(int, int);
     void makeFall(int, int);
+    
+    // Water functions used by loopWater()
+    bool tryToPushThisWaterPixel(int, int);
 };
 
 #endif

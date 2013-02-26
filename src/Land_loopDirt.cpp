@@ -15,7 +15,7 @@ void Land::loopDirt(){
     else i = (k - (width+1)/2)*2 + 1;
     for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
       for(j = (*it).first; j >= (*it).second; --j){
-        // If this is a dirt pixel an it felt at least 1 frame ago
+        // If this pixel is a dirt pixel and it felt at least one frame ago
         if(p[i][j].type == pixelType_DIRT && p[i][j].feltAtThisFrame < frame_id){
           // If the two blocks above this one are dirt, this one is crushed and try to move out
           if(p[i][j-1].type == pixelType_DIRT && p[i][j-2].type == pixelType_DIRT){

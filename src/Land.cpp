@@ -9,6 +9,7 @@ Land::Land(){
   pixelGravityVector[pixelType_SEED] = pixelGravity_MAY_FALL;
   pixelGravityVector[pixelType_LEAVES] = pixelGravity_MAY_FALL;
   pixelGravityVector[pixelType_FRUIT] = pixelGravity_MAY_FALL;
+  pixelGravityVector[pixelType_WATER] = pixelGravity_MAY_FALL;
   
   // Set pixelPhysicalStateVector (constants)
   pixelPhysicalStateVector.resize(pixelType_TOTAL);
@@ -18,6 +19,7 @@ Land::Land(){
   pixelPhysicalStateVector[pixelType_SEED] = pixelPhysicalState_SOLID;
   pixelPhysicalStateVector[pixelType_LEAVES] = pixelPhysicalState_SOLID;
   pixelPhysicalStateVector[pixelType_FRUIT] = pixelPhysicalState_SOLID;
+  pixelPhysicalStateVector[pixelType_WATER] = pixelPhysicalState_LIQUID;
 }
 
 void Land::init(int x, int y){

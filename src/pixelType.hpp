@@ -8,6 +8,7 @@ typedef enum{
   pixelType_SEED,
   pixelType_LEAVES,
   pixelType_FRUIT,
+  pixelType_WATER,
   pixelType_TOTAL
 }pixelType;
 
@@ -18,8 +19,9 @@ typedef enum{
 }pixelGravity;
 
 typedef enum{
-  pixelPhysicalState_SOLID,
-  pixelPhysicalState_GASEOUS
+  pixelPhysicalState_GASEOUS,
+  pixelPhysicalState_LIQUID,
+  pixelPhysicalState_SOLID
 }pixelPhysicalState;
 
 #endif

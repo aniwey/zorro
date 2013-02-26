@@ -44,6 +44,9 @@ void God::pressedALetter(sf::Keyboard::Key letter){
     case sf::Keyboard::B:
       pixelTypeSelected = pixelType_SEED;
     break;
+    case sf::Keyboard::W:
+      pixelTypeSelected = pixelType_WATER;
+    break;
     default: break;
   }
 }

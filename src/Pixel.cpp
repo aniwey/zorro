@@ -82,6 +82,9 @@ void Pixel::setColorBasedOnType(){
     case pixelType_FRUIT:
       setColor(237, 123, 0);
     break;
+    case pixelType_WATER:
+      setColor(95, 101, 208);
+    break;
     default:
       setColor(0, 0, 0);
     break;
