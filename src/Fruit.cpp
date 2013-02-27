@@ -74,26 +74,33 @@ bool Fruit::loop(Land& l){
     case fruitStep_FALLING_INSIDE_LEAVES: // If the fruit is falling inside leaves
       // If the pixel below is non solid and none and we're not at the bottom of the map
       if(pixelY < l.height-1 && l.pixelForegroundPhysicalStateVector[l.p[pixelX][pixelY+1].fType] != pixelForegroundPhysicalState_SOLID && l.p[pixelX][pixelY+1].type == pixelType_NONE){
-        l.p[pixelX][pixelY+1] = l.p[pixelX][pixelY]; // We go down
-        l.p[pixelX][pixelY].type = pixelType_LEAVES; l.p[pixelX][pixelY].resetEntityPointer(); l.p[pixelX][pixelY].color = leavesColorUnderUs; // We set the leaves pixel under us
-        l.p[pixelX][pixelY+1].group = 0; // We have no group now
-        step = fruitStep_JUST_FALLING; // We're just falling now, since we're out of the tree
-        if(dyingStep == fruitDyingStep_NOTHING) dyingStep = fruitDyingStep_LANDING_COULD_BEGIN_DYING; // We try to be landing, which can be changed by the isGoingToFall callback
+        // We swap with the pixel below
+        swap(l.p[pixelX][pixelY], l.p[pixelX][pixelY+1]);
+        // We re-swap the groups because we don't want to change them
+        std::swap(l.p[pixelX][pixelY].group, l.p[pixelX][pixelY+1].group);
+        // We change the type of the pixel where we were : it's leaves, not none
+        l.p[pixelX][pixelY].type = pixelType_LEAVES;
+        // We swap the color of the leaves where we were with the color we saved in memory
+        std::swap(l.p[pixelX][pixelY].color, leavesColorUnderUs);
+        // We notify the land
+        l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-1, pixelX+1, pixelY+2);
+        // We notify the pixel that it moved
         l.p[pixelX][pixelY+1].youJustMovedTo(pixelX, pixelY+1); // We notify the pixel
-        l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-2, pixelX+1, pixelY+1); // We notify
       }
       // Else, if the pixel below is LEAVES
       else if(pixelY < l.height-1 && l.p[pixelX][pixelY+1].type == pixelType_LEAVES){
-        Group* group = l.p[pixelX][pixelY+1].group; // We save the group of the leaves pixel where we are going
-        sf::Color color = l.p[pixelX][pixelY+1].color; // We save the color of the leaves pixel where we are going
-        l.p[pixelX][pixelY+1] = l.p[pixelX][pixelY]; // We go down
-        l.p[pixelX][pixelY+1].group = group; // We take the group of the leaves pixel where we are
-        l.p[pixelX][pixelY].type = pixelType_LEAVES; l.p[pixelX][pixelY].resetEntityPointer(); l.p[pixelX][pixelY].color = leavesColorUnderUs; // We set the leaves pixel under us
-        leavesColorUnderUs = color; // We save the color
+        // We swap with the pixel below
+        swap(l.p[pixelX][pixelY], l.p[pixelX][pixelY+1]);
+        // We re-swap the groups because we don't want to change them
+        std::swap(l.p[pixelX][pixelY].group, l.p[pixelX][pixelY+1].group);
+        // We swap the color of the leaves where we were with the color we saved in memory
+        std::swap(l.p[pixelX][pixelY].color, leavesColorUnderUs);
+        // We notify the land
+        l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-1, pixelX+1, pixelY+2);
+        // We notify the pixel that it moved
         l.p[pixelX][pixelY+1].youJustMovedTo(pixelX, pixelY+1); // We notify the pixel
-        l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-2, pixelX+1, pixelY+1); // We notify
       }
-      // Else, we didn't felt inside leaves or out of leaves, that means we're lading, we try to be landing, which can be changed by the isGoingToFall callback
+      // Else, we didn't felt inside leaves or out of leaves, that means we're landing, we try to be landing, which can be changed later
       else{
         if(dyingStep == fruitDyingStep_NOTHING) dyingStep = fruitDyingStep_LANDING_COULD_BEGIN_DYING;
       }
