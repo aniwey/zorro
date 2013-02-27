@@ -19,8 +19,8 @@ void Land::loopDirt(){
         if(p[i][j].type == pixelType_DIRT && p[i][j].feltAtThisFrame < frame_id){
           // If the two blocks above this one are dirt, this one is crushed and try to move out
           if(p[i][j-1].type == pixelType_DIRT && p[i][j-2].type == pixelType_DIRT){
-            // If the pixel does not touch the left side of the screen and the pixel on its left is gaseous
-            if(i != 0 && pixelPhysicalStateVector[p[i-1][j].type] == pixelPhysicalState_GASEOUS){
+            // If the pixel does not touch the left side of the screen and the pixel on its left is non solid and none
+            if(i != 0 && pixelForegroundPhysicalStateVector[p[i-1][j].fType] != pixelForegroundPhysicalState_SOLID && p[i-1][j].type == pixelType_NONE){
               // We move the pixel to the left
               swap(p[i][j], p[i-1][j]);
               // We tell it that it felt
@@ -33,8 +33,8 @@ void Land::loopDirt(){
               notifyForUpdatingThisRectangle(i-1, l-1, i+1, j+1);
               j = l;
             }
-            // If the pixel does not touch the right side of the screen and the pixel on its right is gaseous
-            else if(i != width-1 && pixelPhysicalStateVector[p[i+1][j].type] == pixelPhysicalState_GASEOUS){
+            // If the pixel does not touch the right side of the screen and the pixel on its right is non solid and none
+            else if(i != width-1 && pixelForegroundPhysicalStateVector[p[i+1][j].fType] != pixelForegroundPhysicalState_SOLID && p[i+1][j].type == pixelType_NONE){
               // We move the pixel to the right
               swap(p[i][j], p[i+1][j]);
               // We tell it that it felt

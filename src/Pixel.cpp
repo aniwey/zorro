@@ -14,16 +14,24 @@ Pixel::~Pixel(){
   resetEntityPointer();
 }
 
-void Pixel::create(pixelType _type, Land& l, int x, int y){
-  // If we had an entity, we stop pointing to our entity
-  resetEntityPointer();
+void Pixel::create(Land& l, int x, int y, pixelType _type, pixelForegroundType _fType){
+  // Changing pixel's type
+  if(_type != pixelType_INVALID){
+    // If we had an entity, we stop pointing to our entity
+    resetEntityPointer();
   
-  if(!createEntity(_type, l, x, y)){ // If no entity is created
-    // Then it's our duty to set attributes
-    type = _type;
-    setColorBasedOnType();
-    if(group != 0) group = group->unregisterPixel(x, y, true);
-    feltAtThisFrame = -1;
+    if(!createEntity(_type, l, x, y)){ // If no entity is created
+      // Then it's our duty to set attributes
+      type = _type;
+      setColorBasedOnType();
+      if(group != 0) group = group->unregisterPixel(x, y, true);
+      feltAtThisFrame = -1;
+    }
+  }
+  
+  // Changing foreground type
+  if(_fType != pixelForegroundType_INVALID){
+    fType = _fType;
   }
 }
 
@@ -64,14 +72,11 @@ void Pixel::setColor(int r, int g, int b){
 
 void Pixel::setColorBasedOnType(){
   switch(type){
-    case pixelType_AIR:
+    case pixelType_NONE:
       setColor(255, 255, 255);
     break;
     case pixelType_DIRT:
       setColor(205, 31, 31);
-    break;
-    case pixelType_STONE:
-      setColor(80, 75, 107);
     break;
     case pixelType_SEED:
       setColor(121, 0, 0);
@@ -81,9 +86,6 @@ void Pixel::setColorBasedOnType(){
     break;
     case pixelType_FRUIT:
       setColor(237, 123, 0);
-    break;
-    case pixelType_WATER:
-      setColor(95, 101, 208);
     break;
     default:
       setColor(0, 0, 0);

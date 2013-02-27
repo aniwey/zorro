@@ -3,23 +3,17 @@
 Land::Land(){
   // Set pixelGravityVector (constants)
   pixelGravityVector.resize(pixelType_TOTAL);
-  pixelGravityVector[pixelType_AIR] = pixelGravity_NOT_RELEVANT;
+  pixelGravityVector[pixelType_NONE] = pixelGravity_NOT_RELEVANT;
   pixelGravityVector[pixelType_DIRT] = pixelGravity_MAY_FALL;
-  pixelGravityVector[pixelType_STONE] = pixelGravity_CANT_FALL;
   pixelGravityVector[pixelType_SEED] = pixelGravity_MAY_FALL;
   pixelGravityVector[pixelType_LEAVES] = pixelGravity_MAY_FALL;
   pixelGravityVector[pixelType_FRUIT] = pixelGravity_MAY_FALL;
-  pixelGravityVector[pixelType_WATER] = pixelGravity_MAY_FALL;
   
-  // Set pixelPhysicalStateVector (constants)
-  pixelPhysicalStateVector.resize(pixelType_TOTAL);
-  pixelPhysicalStateVector[pixelType_AIR] = pixelPhysicalState_GASEOUS;
-  pixelPhysicalStateVector[pixelType_DIRT] = pixelPhysicalState_SOLID;
-  pixelPhysicalStateVector[pixelType_STONE] = pixelPhysicalState_SOLID;
-  pixelPhysicalStateVector[pixelType_SEED] = pixelPhysicalState_SOLID;
-  pixelPhysicalStateVector[pixelType_LEAVES] = pixelPhysicalState_SOLID;
-  pixelPhysicalStateVector[pixelType_FRUIT] = pixelPhysicalState_SOLID;
-  pixelPhysicalStateVector[pixelType_WATER] = pixelPhysicalState_LIQUID;
+  // Set pixelForegroundPhysicalStateVector (constants)
+  pixelForegroundPhysicalStateVector.resize(pixelForegroundType_TOTAL);
+  pixelForegroundPhysicalStateVector[pixelForegroundType_AIR] = pixelForegroundPhysicalState_GASEOUS;
+  pixelForegroundPhysicalStateVector[pixelForegroundType_STONE] = pixelForegroundPhysicalState_SOLID;
+  pixelForegroundPhysicalStateVector[pixelForegroundType_WATER] = pixelForegroundPhysicalState_LIQUID;
 }
 
 void Land::init(int x, int y){
@@ -49,7 +43,7 @@ void Land::newGame(int x, int y){
   init(x, y);
   
   // We fill the land with air
-  writePixelRectangle(0, 0, width, height, pixelType_AIR);
+  writePixelRectangle(0, 0, width, height, pixelType_NONE, pixelForegroundType_AIR);
   
   /*for(int i = 0; i < width; ++i){ // Iteration over the columns
     for(int j = 0; j < height; ++j){ // Iteration over the lines

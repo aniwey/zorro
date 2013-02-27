@@ -21,6 +21,7 @@ class God{
     int getAddingDiameterDependingOnPixelTypeSelected();
     
     pixelType pixelTypeSelected;
+    pixelForegroundType pixelFTypeSelected;
     
   private:
     int pixelAddingDiameter;

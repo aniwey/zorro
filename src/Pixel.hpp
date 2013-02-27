@@ -34,7 +34,7 @@ class Pixel{
     }
     
     // Pixel creation
-    void create(pixelType, Land&, int, int);
+    void create(Land&, int, int, pixelType, pixelForegroundType = pixelForegroundType_INVALID);
     void addEntity(Land&, int, int);
     void setColorBasedOnType();
     
@@ -48,6 +48,7 @@ class Pixel{
     
     // Variables
     pixelType type; // Type of the pixel
+    pixelForegroundType fType; // Foreground type of the pixel
     sf::Color color; // Color of the pixel
     Group* group; // Group of the pixel (optional), if = 0, the pixel has no group
     boost::shared_ptr<Entity> entity; // Pointer towards the entity the pixel is attached to (optional)
@@ -61,6 +62,7 @@ class Pixel{
       ar.template register_type<Seed>();
       ar.template register_type<Fruit>();
       ar & type;
+      ar & fType;
       ar & color;
       ar & group;
       ar & entity;

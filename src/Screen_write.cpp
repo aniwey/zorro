@@ -59,7 +59,18 @@ void Screen::writeLandToImage(Land& l){
     for(unsigned int i = 0; i < l.atu.size(); ++i){ // Iteration over the columns
       for(std::list<std::pair<int, int> >::iterator it = l.atu[i].begin(); it != l.atu[i].end(); it++){ // Iteration over areas in this column
         for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
-          screenImage.setPixel(i, j, l.p[i][j].color);
+          switch(l.p[i][j].fType){
+            case pixelForegroundType_AIR:
+              screenImage.setPixel(i, j, l.p[i][j].color);
+            break;
+            case pixelForegroundType_WATER:
+              screenImage.setPixel(i, j, getMidColor(sf::Color::Blue, l.p[i][j].color, 0.4));
+            break;
+            case pixelForegroundType_STONE:
+              screenImage.setPixel(i, j, sf::Color(80, 75, 107));
+            break;
+            default: break;
+          }
         }
       }
     }
@@ -68,11 +79,38 @@ void Screen::writeLandToImage(Land& l){
   else{
     for(int i = 0; i < l.width; ++i){ // Iteration over the columns
       for(int j = 0; j < l.height; ++j){ // Iteration over the lines
-        screenImage.setPixel(i, j, l.p[i][j].color);
+        switch(l.p[i][j].fType){
+          case pixelForegroundType_AIR:
+            screenImage.setPixel(i, j, l.p[i][j].color);
+          break;
+          case pixelForegroundType_WATER:
+            screenImage.setPixel(i, j, getMidColor(sf::Color::Blue, l.p[i][j].color, 0.4));
+          break;
+          case pixelForegroundType_STONE:
+            screenImage.setPixel(i, j, sf::Color(80, 75, 107));
+          break;
+          default: break;
+        }
       }
     }
     l.redrawEverything = false; // We set redrawEverything to false
   }
+  
+  /* ADD THAT TO SEE AREAS TO UPDATE
+  for(int i = 0; i < l.width; ++i){ // Iteration over the columns
+    for(int j = 0; j < l.height; ++j){ // Iteration over areas in this column
+      screenImage.setPixel(i, j, l.p[i][j].color);
+    }
+  }
+  
+  for(unsigned int i = 0; i < l.atu.size(); ++i){ // Iteration over the columns
+    for(std::list<std::pair<int, int> >::iterator it = l.atu[i].begin(); it != l.atu[i].end(); it++){ // Iteration over areas in this column
+      for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
+        screenImage.setPixel(i, j, getMidColor(sf::Color::Blue, l.p[i][j].color, 0.7));
+      }
+    }
+  }
+  */
 }
 
 void Screen::writeImageToTexture(){

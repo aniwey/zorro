@@ -2,15 +2,22 @@
 #define HPP_PIXELTYPE
 
 typedef enum{
-  pixelType_AIR,
+  pixelType_INVALID,
+  pixelType_NONE,
   pixelType_DIRT,
-  pixelType_STONE,
   pixelType_SEED,
   pixelType_LEAVES,
   pixelType_FRUIT,
-  pixelType_WATER,
   pixelType_TOTAL
 }pixelType;
+
+typedef enum{
+  pixelForegroundType_INVALID,
+  pixelForegroundType_AIR,
+  pixelForegroundType_STONE,
+  pixelForegroundType_WATER,
+  pixelForegroundType_TOTAL
+}pixelForegroundType;
 
 typedef enum{
   pixelGravity_CANT_FALL,
@@ -19,9 +26,9 @@ typedef enum{
 }pixelGravity;
 
 typedef enum{
-  pixelPhysicalState_GASEOUS,
-  pixelPhysicalState_LIQUID,
-  pixelPhysicalState_SOLID
-}pixelPhysicalState;
+  pixelForegroundPhysicalState_GASEOUS,
+  pixelForegroundPhysicalState_LIQUID,
+  pixelForegroundPhysicalState_SOLID
+}pixelForegroundPhysicalState;
 
 #endif

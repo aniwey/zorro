@@ -33,10 +33,10 @@ class Land{
     void loop();
     
     // Writing pixels to the land
-    void writePixelRectangle(int x, int y, int w, int h, pixelType type);
-    void writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type);
-    void writePixelLine(int x1, int y1, int x2, int y2, pixelType type);
-    void writeSinglePixel(int x, int y, pixelType type);
+    void writePixelRectangle(int x, int y, int w, int h, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
+    void writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
+    void writePixelLine(int x1, int y1, int x2, int y2, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
+    void writeSinglePixel(int x, int y, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
     
     // Pixels
     std::vector<std::vector<Pixel> > p; // Pixels array
@@ -62,7 +62,7 @@ class Land{
     
     // Various tests on pixels
     std::vector<pixelGravity> pixelGravityVector;
-    std::vector<pixelPhysicalState> pixelPhysicalStateVector;
+    std::vector<pixelForegroundPhysicalState> pixelForegroundPhysicalStateVector;
     bool aPixelOfThisGroupIsAdjacentToThisOne(int x, int y, Group* group);
     bool thisPixelExists(int x, int y);
     int howManyPixelsOfThisTypeAndThisGroupInThisRectangle(pixelType type, Group* group, int x1, int y1, int x2, int y2);

@@ -1,6 +1,6 @@
 #include "Land.hpp"
 
-void Land::loopPixels(){  
+void Land::loopPixels(){
   checkForGroupsSplittingAndUpdateDependencies();
   resolveDependenciesBetweenGroups();
   applyGravityOnAtu();
@@ -74,11 +74,11 @@ void Land::applyGravityOnAtu(){
       
       // We try to make fall the very last pixel, and we save the return value : true if it felt, false otherwise
       bool theVeryLastPixelFelt = tryToMakeFall(i, (*it).second);
-      if(theVeryLastPixelFelt) notifyForUpdatingAroundThisPixel(i, (*it).second); // If it felt, we notify
+      if(theVeryLastPixelFelt) notifyForUpdatingThisRectangle(i-1, (*it).second-1, i+1, (*it).second+2); // If it felt, we notify
       
       // Here, we have made fall every pixel in the area which was able to fall. But if we made fall the very last pixel, maybe it allowed for above pixels to fall to ?
       if(theVeryLastPixelFelt){
-        // That's why we now try to make fall every above pixels until we reach either the top of the map or the beginning or the next area
+        // That's why we now try to make fall every above pixels until we reach either the top of the map or the beginning of the next area
         // We first set the y position where we'll stop (top of the land or beginning of the next area)
         int yStop;
         std::list<std::pair<int, int> >::iterator nextArea = it;
@@ -97,7 +97,7 @@ void Land::applyGravityOnAtu(){
             break;
           }
         }
-        // If we're here, it meanes we reached yStop : we notify
+        // If we're here, it means we reached yStop : we notify
         notifyForUpdatingThisRectangle(i-1, yStop-1, i+1, (*it).second+1);
       }
     }
@@ -122,18 +122,37 @@ void Land::checkForGroupsSplittingAndUpdateDependencies(){
   for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){ // Iteration over groups
     (*it).checked = false;
   }
-    
+  
+  // Check for splitting all groups
+  for(std::list<Group>::iterator it = g.begin(); it != g.end(); it++){
+    if((*it).checked == false){
+      (*it).checked = true; // It's checked now
+      (*it).checkForSplitting(*this); // And we check for splitting
+    }
+  }
+  
+  /*
+  // If there's at least one group
+  if(g.size() != 0){
+    // Check for splitting groups inside the areas to update
+    for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
+      for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
+        for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
+          if(p[i][j].group != 0 && p[i][j].group->checked == false){
+            p[i][j].group->checked = true; // It's checked now
+            p[i][j].group->checkForSplitting(*this); // And we check for splitting
+          }
+        }
+      }
+    }
+  }
+  */
+  
   // Update dependencies of group pixels in the areas to update
   for(unsigned int i = 0; i < atu.size(); ++i){ // Iteration over the columns
     for(std::list<std::pair<int, int> >::iterator it = atu[i].begin(); it != atu[i].end(); it++){ // Iteration over areas in this column
       for(int j = (*it).first; j >= (*it).second; --j){ // Iteration over pixels in this area
-        if(p[i][j].group != 0){ // If this pixel has a group
-          // If the group wasn't checked already
-          if(p[i][j].group->checked == false){
-            p[i][j].group->checked = true; // It's checked now
-            p[i][j].group->checkForSplitting(*this); // And we check for splitting
-          }
-        
+        if(p[i][j].group != 0){ // If this pixel has a group        
           // We get the group pixel corresponding to the pixel and we save it for future operations
           boost::shared_ptr<GroupPixel> groupPixelWeAreWorkingOn = p[i][j].group->getGroupPixelSharedPtr(i, j);
         
@@ -143,7 +162,7 @@ void Land::checkForGroupsSplittingAndUpdateDependencies(){
           // We set the default dependency, which will be applied if nothing relevant is found below the pixel
           groupPixelWeAreWorkingOn->depType = GroupDependencyType_BOTTOM_OF_THE_MAP;
           
-          // We search below until we find a pixel with a group / which can't fall / gaseous
+          // We search below until we find a pixel with a group / which can't fall / solid / non solid but none
           for(int k = j+1; k < height; ++k){
             if(p[i][k].group != 0){ // If this pixel below has a group
               if(p[i][j].group != p[i][k].group){ // If its group is different from ours
@@ -187,13 +206,13 @@ void Land::checkForGroupsSplittingAndUpdateDependencies(){
               }
               break;
             }
-            // Else, if this pixel below can't fall, we set the dependency
-            else if(pixelGravityVector[p[i][k].type] == pixelGravity_CANT_FALL){
+            // Else, if the foreground is solid or the pixel below can't fall, we set the dependency
+            else if(pixelForegroundPhysicalStateVector[p[i][k].fType] == pixelForegroundPhysicalState_SOLID || pixelGravityVector[p[i][k].type] == pixelGravity_CANT_FALL){
               groupPixelWeAreWorkingOn->depType = GroupDependencyType_CANT_FALL_PIXEL;
               break;
             }
-            // Else, if this pixel below is gaseous, there's no dependency
-            else if(pixelPhysicalStateVector[p[i][k].type] == pixelPhysicalState_GASEOUS){
+            // Else, if the foreground isn't solid but the pixel is none
+            else if(pixelForegroundPhysicalStateVector[p[i][k].fType] != pixelForegroundPhysicalState_SOLID && p[i][k].type == pixelType_NONE){
               groupPixelWeAreWorkingOn->depType = GroupDependencyType_NOTHING;
               break;
             }
@@ -205,7 +224,8 @@ void Land::checkForGroupsSplittingAndUpdateDependencies(){
 }
 
 bool Land::tryToMakeFall(int x, int y){
-  if(pixelPhysicalStateVector[p[x][y+1].type] == pixelPhysicalState_GASEOUS && // If the pixel below is gaseous
+  if(pixelForegroundPhysicalStateVector[p[x][y+1].fType] != pixelForegroundPhysicalState_SOLID && // If the pixel below is non solid
+     p[x][y+1].type == pixelType_NONE && // And the pixel is none
      ((p[x][y].group != 0 && p[x][y].group->canFall()) || (p[x][y].group == 0 && pixelGravityVector[p[x][y].type] == pixelGravity_MAY_FALL))){ // And the pixel has a group which can fall OR has no group but may fall
     makeFall(x, y);
     return true;
@@ -229,8 +249,8 @@ bool Land::tryToMakeFallAlongWithPixelsBelow(int x, int y){
     }
   }
   
-  // If there's a gaseous pixel at maxHeight
-  if(pixelPhysicalStateVector[p[x][maxHeight].type] == pixelPhysicalState_GASEOUS){
+  // If there's a non solid pixel at maxHeight && the pixel is none
+  if(pixelForegroundPhysicalStateVector[p[x][maxHeight].fType] != pixelForegroundPhysicalState_SOLID && p[x][maxHeight].type == pixelType_NONE){
     // Make fall pixels from y to maxHeight-1
     for(int j = maxHeight-1; j >= y; --j){
       makeFall(x, j);

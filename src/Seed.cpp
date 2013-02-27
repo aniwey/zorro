@@ -11,8 +11,8 @@ Seed::Seed(Land& l, int x, int y): Entity(l.frame_id, x, y){
     if(l.p[pixelX][pixelY].type == pixelType_DIRT){
       step = seedStep_PLANTED;
     }
-    // Else, if we're already landing on a solid pixel
-    else if((pixelY < l.height-1 && l.pixelPhysicalStateVector[l.p[pixelX][pixelY+1].type] == pixelPhysicalState_SOLID) || pixelY == l.height-1){
+    // Else, if we're already landing on a solid pixel or a non-solid not-none pixel
+    else if((pixelY < l.height-1 && (l.pixelForegroundPhysicalStateVector[l.p[pixelX][pixelY+1].fType] == pixelForegroundPhysicalState_SOLID || (l.pixelForegroundPhysicalStateVector[l.p[pixelX][pixelY+1].fType] != pixelForegroundPhysicalState_SOLID && l.p[pixelX][pixelY+1].type != pixelType_NONE))) || pixelY == l.height-1){
       step = seedStep_LANDING;
     }
     // Else, we're just falling
@@ -46,8 +46,8 @@ bool Seed::loop(Land& l){
   
   switch(step){
     case seedStep_FALLING:
-      // If there's no more air under us, we move to the next step
-      if((pixelY < l.height-1 && l.p[pixelX][pixelY+1].type != pixelType_AIR) || pixelY == l.height-1){
+      // If there's no more space to fall under us, we move to the next step
+      if((pixelY < l.height-1 && (l.pixelForegroundPhysicalStateVector[l.p[pixelX][pixelY+1].fType] == pixelForegroundPhysicalState_SOLID || (l.pixelForegroundPhysicalStateVector[l.p[pixelX][pixelY+1].fType] != pixelForegroundPhysicalState_SOLID && l.p[pixelX][pixelY+1].type != pixelType_NONE))) || pixelY == l.height-1){
         step = seedStep_LANDING; // We move to the next step
         time = 0; // And we reset the time
       }
@@ -55,7 +55,7 @@ bool Seed::loop(Land& l){
     case seedStep_LANDING:
       // If there's dirt under us, we go into the dirt and we move to the next step
       if(pixelY < l.height-1 && l.p[pixelX][pixelY+1].type == pixelType_DIRT){
-        l.p[pixelX][pixelY+1].create(pixelType_AIR, l, pixelX, pixelY+1); // We make space above in order to go there
+        l.p[pixelX][pixelY+1].create(l, pixelX, pixelY+1, pixelType_NONE); // We make space below in order to go there
         swap(l.p[pixelX][pixelY], l.p[pixelX][pixelY+1]); // We move to the down
         l.p[pixelX][pixelY+1].youJustMovedTo(pixelX, pixelY+1); // We notify the pixel
         l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-1, pixelX+1, pixelY+1); // We notify
@@ -158,8 +158,8 @@ bool Seed::growLeafHere(Land &l, int xGrow, int yGrow, int xSeed, int ySeed, boo
   // If the pixel exists, then we may grow something here!
   if(l.thisPixelExists(xGrow, yGrow)){
     // If the pixel here is gaseous and there's a pixel of our group adjacent to it, then we grow a leaf
-    if(l.pixelPhysicalStateVector[l.p[xGrow][yGrow].type] == pixelPhysicalState_GASEOUS && l.aPixelOfThisGroupIsAdjacentToThisOne(xGrow, yGrow, l.p[xSeed][ySeed].group)){
-      l.p[xGrow][yGrow].create(pixelType_LEAVES, l, xGrow, yGrow);
+    if(l.pixelForegroundPhysicalStateVector[l.p[xGrow][yGrow].fType] != pixelForegroundPhysicalState_SOLID && l.p[xGrow][yGrow].type == pixelType_NONE && l.aPixelOfThisGroupIsAdjacentToThisOne(xGrow, yGrow, l.p[xSeed][ySeed].group)){
+      l.p[xGrow][yGrow].create(l, xGrow, yGrow, pixelType_LEAVES);
       l.p[xGrow][yGrow].group = l.p[xSeed][ySeed].group->registerPixel(xGrow, yGrow);
       // We notify
       l.notifyForUpdatingAroundThisPixel(xGrow, yGrow);
@@ -169,7 +169,7 @@ bool Seed::growLeafHere(Land &l, int xGrow, int yGrow, int xSeed, int ySeed, boo
     else if(andMaybeAFruit && 
             l.howManyPixelsOfThisTypeAndThisGroupInThisRectangle(pixelType_LEAVES, l.p[xSeed][ySeed].group, xGrow-1, yGrow-1, xGrow+1, yGrow+1) == 9 &&
             ((yGrow > ySeed) || (xGrow != xSeed))){
-      l.p[xGrow][yGrow].create(pixelType_FRUIT, l, xGrow, yGrow);
+      l.p[xGrow][yGrow].create(l, xGrow, yGrow, pixelType_FRUIT);
       // We notify
       l.notifyForUpdatingAroundThisPixel(xGrow, yGrow);
       return true;

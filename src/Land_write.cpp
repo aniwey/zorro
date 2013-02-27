@@ -1,6 +1,6 @@
 #include "Land.hpp"
 
-void Land::writePixelRectangle(int x, int y, int w, int h, pixelType type){
+void Land::writePixelRectangle(int x, int y, int w, int h, pixelType type, pixelForegroundType fType){
   // We possibly modify x, y, w, h to correct them is we're trying to write anything outside the land
   if(x < 0){ w += x; x = 0; }
   if(y < 0){ h += y; y = 0; }
@@ -10,15 +10,15 @@ void Land::writePixelRectangle(int x, int y, int w, int h, pixelType type){
   // We write
   for(int i = x; i < x + w; ++i){
     for(int j = y; j < y + h; ++j){
-      writeSinglePixel(i, j, type);
+      writeSinglePixel(i, j, type, fType);
     }
   }
 }
 
-void Land::writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type){
+void Land::writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type, pixelForegroundType fType){
   // If we're trying to draw a line, then we just draw a line
   if(size == 1)
-    writePixelLine(x1, y1, x2, y2, type);
+    writePixelLine(x1, y1, x2, y2, type, fType);
   // Else, it's gonna be a bit more complex
   else{
     // Calculate points positions
@@ -51,27 +51,27 @@ void Land::writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int
     // Draw
     if(diagonalsAreOrientedUpLeftAndDownRight){
       for(int i = 0; i < size; ++i)
-        writePixelLine(p1x, p1y + i, p2x - i, p2y, type);
+        writePixelLine(p1x, p1y + i, p2x - i, p2y, type, fType);
       for(int i = 1; i < size; ++i)
-        writePixelLine(p1x + i, p1y, p2x, p2y - i, type);
+        writePixelLine(p1x + i, p1y, p2x, p2y - i, type, fType);
     }
     else{
       for(int i = 0; i < size; ++i)
-        writePixelLine(p1x, p1y - i, p2x - i, p2y, type);
+        writePixelLine(p1x, p1y - i, p2x - i, p2y, type, fType);
       for(int i = 1; i < size; ++i)
-        writePixelLine(p1x + i, p1y, p2x, p2y + i, type);
+        writePixelLine(p1x + i, p1y, p2x, p2y + i, type, fType);
     }
   }
 }
 
-void Land::writeSinglePixel(int x, int y, pixelType type){
+void Land::writeSinglePixel(int x, int y, pixelType type, pixelForegroundType fType){
   if(x >= 0 && y >= 0 && x < width && y < height){
-    p[x][y].create(type, *this, x, y);
+    p[x][y].create(*this, x, y, type, fType);
     notifyForUpdatingAroundThisPixel(x, y);
   }
 }
 
-void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
+void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type, pixelForegroundType fType){
   int dx, dy;
   
   if((dx = x2 - x1) != 0){
@@ -86,7 +86,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dy *= 2;
             bool stop = false;
             while(stop == false){ // Horizontal movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((x1 = x1 + 1) == x2) stop = true;
               if((e -= dy) < 0){
                 y1++; // Diagonal movement
@@ -101,7 +101,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dx *= 2;
             bool stop = false;
             while(stop == false){ // Vertical movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((y1 = y1 + 1) == y2) stop = true;
               if((e = e - dx) < 0){
                 x1++; // Diagonal movement
@@ -119,7 +119,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dy *= 2;
             bool stop = false;
             while(stop == false){ // Horizontal movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((x1 = x1 + 1) == x2) stop = true;
               if((e = e + dy) < 0){
                 y1--; // Diagonal movement
@@ -133,7 +133,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dx *= 2;
             bool stop = false;
             while(stop == false){ // Vertical movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((y1 = y1 - 1) == y2) stop = true;
               if((e = e + dx) > 0){
                 x1++; // Diagonal movement
@@ -146,7 +146,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
       else{ // dy = 0 (and dx > 0)
         // Horizontal vector to the right
         do{
-          writeSinglePixel(x1, y1, type);
+          writeSinglePixel(x1, y1, type, fType);
         }while((x1 = x1 + 1) != x2);
       }
     }
@@ -161,7 +161,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dy *= 2;
             bool stop = false;
             while(stop == false){ // Horizontal movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((x1 = x1 - 1) == x2) stop = true;
               if((e = e + dy) >= 0){
                 y1++; // Diagonal movement
@@ -176,7 +176,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dx *= 2;
             bool stop = false;
             while(stop == false){ // Vertical movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((y1 = y1 + 1) == y2) stop = true;
               if((e = e + dx) <= 0){
                 x1--; // Diagonal movement
@@ -194,7 +194,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dy *= 2;
             bool stop = false;
             while(stop == false){ // Horizontal movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((x1 = x1 - 1) == x2) stop = true;
               if((e = e - dy) >= 0){
                 y1--; // Diagonal movement
@@ -208,7 +208,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
             dx = dx * 2;
             bool stop = false;
             while(stop == false){ // Vertical movement
-              writeSinglePixel(x1, y1, type);
+              writeSinglePixel(x1, y1, type, fType);
               if((y1 = y1 - 1) == y2) stop = true;
               if((e = e - dx) >= 0){
                 x1--; // Diagonal movement
@@ -221,7 +221,7 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
       else{ // dy = 0 (and dx < 0)
         // Horizontal vector to the left
         do{
-          writeSinglePixel(x1, y1, type);
+          writeSinglePixel(x1, y1, type, fType);
         }while((x1 = x1 - 1) != x2);
         
       }
@@ -231,12 +231,12 @@ void Land::writePixelLine(int x1, int y1, int x2, int y2, pixelType type){
     if((dy = y2 - y1) != 0){
       if(dy > 0){
         do{
-          writeSinglePixel(x1, y1, type);
+          writeSinglePixel(x1, y1, type, fType);
         }while((y1 += 1) != y2);
       }
       else{ // dy < 0 (and dx = 0)
         do{
-          writeSinglePixel(x1, y1, type);
+          writeSinglePixel(x1, y1, type, fType);
         }while((y1 -= 1) != y2);
       }
     } 
