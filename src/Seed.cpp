@@ -157,7 +157,7 @@ void Seed::growLeaves(Land& l, int xSeed, int ySeed, bool withFruits){
 bool Seed::growLeafHere(Land &l, int xGrow, int yGrow, int xSeed, int ySeed, bool andMaybeAFruit){
   // If the pixel exists, then we may grow something here!
   if(l.thisPixelExists(xGrow, yGrow)){
-    // If the pixel here is gaseous and there's a pixel of our group adjacent to it, then we grow a leaf
+    // If the pixel here is none and has a non solid foreground and there's a pixel of our group adjacent to it, then we grow a leaf
     if(l.pixelForegroundPhysicalStateVector[l.p[xGrow][yGrow].fType] != pixelForegroundPhysicalState_SOLID && l.p[xGrow][yGrow].type == pixelType_NONE && l.aPixelOfThisGroupIsAdjacentToThisOne(xGrow, yGrow, l.p[xSeed][ySeed].group)){
       l.p[xGrow][yGrow].create(l, xGrow, yGrow, pixelType_LEAVES);
       l.p[xGrow][yGrow].group = l.p[xSeed][ySeed].group->registerPixel(xGrow, yGrow);

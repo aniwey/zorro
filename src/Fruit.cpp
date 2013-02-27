@@ -85,7 +85,10 @@ bool Fruit::loop(Land& l){
         // We notify the land
         l.notifyForUpdatingThisRectangle(pixelX-1, pixelY-1, pixelX+1, pixelY+2);
         // We notify the pixel that it moved
-        l.p[pixelX][pixelY+1].youJustMovedTo(pixelX, pixelY+1); // We notify the pixel
+        l.p[pixelX][pixelY+1].youJustMovedTo(pixelX, pixelY+1);
+        // We handle steps
+        step = fruitStep_JUST_FALLING; // We're just falling now, since we're out of the tree
+        if(dyingStep == fruitDyingStep_NOTHING) dyingStep = fruitDyingStep_LANDING_COULD_BEGIN_DYING; // We try to be landing, which can be changed by the isGoingToFall callback
       }
       // Else, if the pixel below is LEAVES
       else if(pixelY < l.height-1 && l.p[pixelX][pixelY+1].type == pixelType_LEAVES){
