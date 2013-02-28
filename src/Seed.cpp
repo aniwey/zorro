@@ -2,7 +2,7 @@
 
 #include "Seed.hpp"
 
-Seed::Seed(Land& l, int x, int y): Entity(l.frame_id, x, y){
+Seed::Seed(Land& l, int x, int y): Entity(x, y){
   // Set time
   time = 0;
   
@@ -32,8 +32,6 @@ Seed::~Seed(){
 }
 
 bool Seed::loop(Land& l){
-  last_frame_id = l.frame_id;
-  
   // If the pixel where the seed is just felt
   if(l.p[pixelX][pixelY].feltAtThisFrame == l.frame_id){
     // If the seed isn't normally falling and isn't already dying
@@ -91,15 +89,15 @@ bool Seed::loop(Land& l){
         time++;
       }
       
-      growLeaves(l, pixelX, pixelY, false);
+      growLeaves(l, false);
     break;
     case seedStep_GROWING_WITH_FRUITS:
       if(time > 20){
-        growLeaves(l, pixelX, pixelY, true);
+        growLeaves(l, true);
         time = 0;
       }
       else{
-        growLeaves(l, pixelX, pixelY, false);
+        growLeaves(l, false);
         time++;
       }
     break;
@@ -117,7 +115,7 @@ bool Seed::loop(Land& l){
   return false;
 }
 
-void Seed::growLeaves(Land& l, int xSeed, int ySeed, bool withFruits){
+void Seed::growLeaves(Land& l, bool withFruits){
   int i, j, d;
   bool aLeafGrew = false;
   
@@ -127,14 +125,14 @@ void Seed::growLeaves(Land& l, int xSeed, int ySeed, bool withFruits){
     j = r;
     d = r-1;
     while(j >= i && aLeafGrew == false){
-      aLeafGrew = growLeafHere(l, xSeed+j, ySeed-i, xSeed, ySeed, withFruits); // 0 -> pi/4
-      if(!aLeafGrew) aLeafGrew = growLeafHere(l, xSeed+i, ySeed-j, xSeed, ySeed, withFruits); // pi/4 -> pi/2
-      if(!aLeafGrew) aLeafGrew = growLeafHere(l, xSeed-i, ySeed-j, xSeed, ySeed, withFruits); // pi/2 -> 3pi/4
-      if(!aLeafGrew) aLeafGrew = growLeafHere(l, xSeed-j, ySeed-i, xSeed, ySeed, withFruits); // 3pi/4 -> pi
-      if(!aLeafGrew) aLeafGrew = growLeafHere(l, xSeed-j, ySeed+i, xSeed, ySeed, withFruits); // -pi -> -3pi/4
-      if(!aLeafGrew) aLeafGrew = growLeafHere(l, xSeed-i, ySeed+j, xSeed, ySeed, withFruits); // -3pi/4 -> -pi/2
-      if(!aLeafGrew) aLeafGrew = growLeafHere(l, xSeed+i, ySeed+j, xSeed, ySeed, withFruits); // -pi/2 -> -pi/4
-      if(!aLeafGrew) aLeafGrew = growLeafHere(l, xSeed+j, ySeed+i, xSeed, ySeed, withFruits); // -pi/4 -> 0
+      aLeafGrew = growLeafHere(l, pixelX+j, pixelY-i, withFruits); // 0 -> pi/4
+      if(!aLeafGrew) aLeafGrew = growLeafHere(l, pixelX+i, pixelY-j, withFruits); // pi/4 -> pi/2
+      if(!aLeafGrew) aLeafGrew = growLeafHere(l, pixelX-i, pixelY-j, withFruits); // pi/2 -> 3pi/4
+      if(!aLeafGrew) aLeafGrew = growLeafHere(l, pixelX-j, pixelY-i, withFruits); // 3pi/4 -> pi
+      if(!aLeafGrew) aLeafGrew = growLeafHere(l, pixelX-j, pixelY+i, withFruits); // -pi -> -3pi/4
+      if(!aLeafGrew) aLeafGrew = growLeafHere(l, pixelX-i, pixelY+j, withFruits); // -3pi/4 -> -pi/2
+      if(!aLeafGrew) aLeafGrew = growLeafHere(l, pixelX+i, pixelY+j, withFruits); // -pi/2 -> -pi/4
+      if(!aLeafGrew) aLeafGrew = growLeafHere(l, pixelX+j, pixelY+i, withFruits); // -pi/4 -> 0
       if(!aLeafGrew){
         if(d >= 2*i){
           d = d-2*i-1;
@@ -154,21 +152,21 @@ void Seed::growLeaves(Land& l, int xSeed, int ySeed, bool withFruits){
   }
 }
 
-bool Seed::growLeafHere(Land &l, int xGrow, int yGrow, int xSeed, int ySeed, bool andMaybeAFruit){
+bool Seed::growLeafHere(Land &l, int xGrow, int yGrow, bool andMaybeAFruit){
   // If the pixel exists, then we may grow something here!
   if(l.thisPixelExists(xGrow, yGrow)){
     // If the pixel here is none and has a non solid foreground and there's a pixel of our group adjacent to it, then we grow a leaf
-    if(l.pixelForegroundPhysicalStateVector[l.p[xGrow][yGrow].fType] != pixelForegroundPhysicalState_SOLID && l.p[xGrow][yGrow].type == pixelType_NONE && l.aPixelOfThisGroupIsAdjacentToThisOne(xGrow, yGrow, l.p[xSeed][ySeed].group)){
+    if(l.pixelForegroundPhysicalStateVector[l.p[xGrow][yGrow].fType] != pixelForegroundPhysicalState_SOLID && l.p[xGrow][yGrow].type == pixelType_NONE && l.aPixelOfThisGroupIsAdjacentToThisOne(xGrow, yGrow, l.p[pixelX][pixelY].group)){
       l.p[xGrow][yGrow].create(l, xGrow, yGrow, pixelType_LEAVES);
-      l.p[xGrow][yGrow].group = l.p[xSeed][ySeed].group->registerPixel(xGrow, yGrow);
+      l.p[xGrow][yGrow].group = l.p[pixelX][pixelY].group->registerPixel(xGrow, yGrow);
       // We notify
       l.notifyForUpdatingAroundThisPixel(xGrow, yGrow);
       return true;
     }
     // Else, if we can grow a fruit and the nine pixels here are leaves of our group and we're not trying to grow it on top of the seed
     else if(andMaybeAFruit && 
-            l.howManyPixelsOfThisTypeAndThisGroupInThisRectangle(pixelType_LEAVES, l.p[xSeed][ySeed].group, xGrow-1, yGrow-1, xGrow+1, yGrow+1) == 9 &&
-            ((yGrow > ySeed) || (xGrow != xSeed))){
+            l.howManyPixelsOfThisTypeAndThisGroupInThisRectangle(pixelType_LEAVES, l.p[pixelX][pixelY].group, xGrow-1, yGrow-1, xGrow+1, yGrow+1) == 9 &&
+            ((yGrow > pixelY) || (xGrow != pixelX))){
       l.p[xGrow][yGrow].create(l, xGrow, yGrow, pixelType_FRUIT);
       // We notify
       l.notifyForUpdatingAroundThisPixel(xGrow, yGrow);

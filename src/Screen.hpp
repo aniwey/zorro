@@ -66,6 +66,7 @@ class Screen{
     int imageWidth, imageHeight;
     sf::Image screenImage;
     void writeLandToImage(Land&);
+    void writePixelToImage(Land&, int, int);
     
     // Land view, just called "view"
     sf::View view;

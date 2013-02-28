@@ -14,7 +14,7 @@ Pixel::~Pixel(){
   resetEntityPointer();
 }
 
-void Pixel::create(Land& l, int x, int y, pixelType _type, pixelForegroundType _fType){
+void Pixel::create(Land& l, int x, int y, pixelType _type, pixelForegroundType _fType, bool changeFTypeOnlyIfPreviousIsSolid){
   // Changing pixel's type
   if(_type != pixelType_INVALID){
     // If we had an entity, we stop pointing to our entity
@@ -30,7 +30,7 @@ void Pixel::create(Land& l, int x, int y, pixelType _type, pixelForegroundType _
   }
   
   // Changing foreground type
-  if(_fType != pixelForegroundType_INVALID){
+  if(_fType != pixelForegroundType_INVALID && (changeFTypeOnlyIfPreviousIsSolid == false || l.pixelForegroundPhysicalStateVector[fType] == pixelForegroundPhysicalState_SOLID)){
     fType = _fType;
   }
 }

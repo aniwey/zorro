@@ -45,21 +45,29 @@ void Land::newGame(int x, int y){
   // We fill the land with air
   writePixelRectangle(0, 0, width, height, pixelType_NONE, pixelForegroundType_AIR);
   
-  /*for(int i = 0; i < width; ++i){ // Iteration over the columns
+  /*
+  for(int i = 0; i < width; ++i){ // Iteration over the columns
     for(int j = 0; j < height; ++j){ // Iteration over the lines
-      switch(randomBetween(0, 4)){
+      switch(randomBetween(0, 6)){
         case 0:
-          writeSinglePixel(i, j, pixelType_AIR);
+          // still air
         break;
         case 1:
           writeSinglePixel(i, j, pixelType_DIRT);
         break;
         case 2:
-          writeSinglePixel(i, j, pixelType_STONE);
+          writeSinglePixel(i, j, pixelType_NONE, pixelForegroundType_STONE);
         break;
         case 3:
           writeSinglePixel(i, j, pixelType_DIRT);
           writeSinglePixel(i, j, pixelType_SEED);
+        break;
+        case 4:
+          writeSinglePixel(i, j, pixelType_DIRT, pixelForegroundType_WATER);
+        break;
+        case 5:
+          writeSinglePixel(i, j, pixelType_DIRT, pixelForegroundType_WATER);
+          writeSinglePixel(i, j, pixelType_SEED, pixelForegroundType_WATER);
         break;
       }
     }

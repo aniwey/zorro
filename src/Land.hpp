@@ -33,10 +33,10 @@ class Land{
     void loop();
     
     // Writing pixels to the land
-    void writePixelRectangle(int x, int y, int w, int h, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
-    void writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
-    void writePixelLine(int x1, int y1, int x2, int y2, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
-    void writeSinglePixel(int x, int y, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID);
+    void writePixelRectangle(int x, int y, int w, int h, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID, bool changeFTypeOnlyIfPreviousIsSolid = false);
+    void writeEverythingBetweenTwoOrientedIdenticalSquares(int x1, int y1, int x2, int y2, int size, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID, bool changeFTypeOnlyIfPreviousIsSolid = false);
+    void writePixelLine(int x1, int y1, int x2, int y2, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID, bool changeFTypeOnlyIfPreviousIsSolid = false);
+    void writeSinglePixel(int x, int y, pixelType type, pixelForegroundType fType = pixelForegroundType_INVALID, bool changeFTypeOnlyIfPreviousIsSolid = false);
     
     // Pixels
     std::vector<std::vector<Pixel> > p; // Pixels array

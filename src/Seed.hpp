@@ -41,8 +41,8 @@ class Seed:public Entity{
     int time; // Used to count number of loops we spend on certain steps
     
     // Functions
-    void growLeaves(Land&, int xSeed, int ySeed, bool withFruits);
-    bool growLeafHere(Land&, int xGrow, int yGrow, int xSeed, int ySeed, bool andMaybeAFruit);
+    void growLeaves(Land&, bool withFruits);
+    bool growLeafHere(Land&, int xGrow, int yGrow, bool andMaybeAFruit);
 };
 
 #endif

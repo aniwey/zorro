@@ -22,6 +22,7 @@ class God{
     
     pixelType pixelTypeSelected;
     pixelForegroundType pixelFTypeSelected;
+    bool changeFTypeOnlyIfPreviousIsSolid;
     
   private:
     int pixelAddingDiameter;

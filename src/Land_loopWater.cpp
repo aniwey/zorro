@@ -18,11 +18,12 @@ void Land::loopWater(){
             if(tryToPushThisWaterPixel(i, j)){
               // We move all the water pixels above
               int l = j-1; while(p[i][l].fType == pixelForegroundType_WATER && l >= 0) { l--; }
-              l++;
-              // Here l is the last pixel with water foreground : we swap with j
+              l++; // Here l is the last pixel with water foreground
+              // We swap the air pixel at j with the water pixel at l
               std::swap(p[i][j].fType, p[i][l].fType);
-              // We notify
+              // We notify around l (the rest of the notifications being handled by the tryToPushThisWaterPixel function)
               notifyForUpdatingThisRectangle(i-1, l-1, i+1, j+1);
+              // We continue from l
               j = l;
             }
           }
@@ -66,6 +67,7 @@ bool Land::tryToPushThisWaterPixel(int x, int y){
         default: break;
       }
     }
+    if(canPushRight == false && canPushLeft == false) return false;
   }
   
   return false;

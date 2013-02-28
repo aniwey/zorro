@@ -13,15 +13,15 @@ void God::addThings(Land& l, int oldLandCursorX, int oldLandCursorY, int newLand
   if(pixelTypeSelected != pixelType_SEED){
     // If the land cursor didn't move this loop
     if(oldLandCursorX == newLandCursorX && oldLandCursorY == newLandCursorY)
-      l.writePixelRectangle(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, diameter, diameter, pixelTypeSelected, pixelFTypeSelected);
+      l.writePixelRectangle(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, diameter, diameter, pixelTypeSelected, pixelFTypeSelected, changeFTypeOnlyIfPreviousIsSolid);
     // Else, the land cursor moved this loop
     else{
-      l.writeEverythingBetweenTwoOrientedIdenticalSquares(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, newLandCursorX - diameter/2, newLandCursorY - diameter/2, diameter, pixelTypeSelected, pixelFTypeSelected);
+      l.writeEverythingBetweenTwoOrientedIdenticalSquares(oldLandCursorX - diameter/2, oldLandCursorY - diameter/2, newLandCursorX - diameter/2, newLandCursorY - diameter/2, diameter, pixelTypeSelected, pixelFTypeSelected, changeFTypeOnlyIfPreviousIsSolid);
     }
   }
   // Else, it can't be added massively, but it can if we just did an active adding event
   else if(activeAddingEvent){
-    l.writeSinglePixel(oldLandCursorX, oldLandCursorY, pixelTypeSelected, pixelFTypeSelected);
+    l.writeSinglePixel(oldLandCursorX, oldLandCursorY, pixelTypeSelected, pixelFTypeSelected, changeFTypeOnlyIfPreviousIsSolid);
   }
 }
 
@@ -32,6 +32,7 @@ void God::movedMouseWheel(int delta){
 }
 
 void God::pressedALetter(sf::Keyboard::Key letter){
+  changeFTypeOnlyIfPreviousIsSolid = false;
   switch(letter){
     case sf::Keyboard::A:
       pixelTypeSelected = pixelType_NONE;
@@ -39,7 +40,8 @@ void God::pressedALetter(sf::Keyboard::Key letter){
     break;
     case sf::Keyboard::D:
       pixelTypeSelected = pixelType_DIRT;
-      pixelFTypeSelected = pixelForegroundType_INVALID;
+      pixelFTypeSelected = pixelForegroundType_AIR;
+      changeFTypeOnlyIfPreviousIsSolid = true;
     break;
     case sf::Keyboard::S:
       pixelTypeSelected = pixelType_NONE;
@@ -48,6 +50,7 @@ void God::pressedALetter(sf::Keyboard::Key letter){
     case sf::Keyboard::B:
       pixelTypeSelected = pixelType_SEED;
       pixelFTypeSelected = pixelForegroundType_INVALID;
+      changeFTypeOnlyIfPreviousIsSolid = true;
     break;
     case sf::Keyboard::W:
       pixelTypeSelected = pixelType_NONE;

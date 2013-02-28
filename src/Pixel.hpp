@@ -34,7 +34,7 @@ class Pixel{
     }
     
     // Pixel creation
-    void create(Land&, int, int, pixelType, pixelForegroundType = pixelForegroundType_INVALID);
+    void create(Land&, int, int, pixelType, pixelForegroundType = pixelForegroundType_INVALID, bool = false);
     void addEntity(Land&, int, int);
     void setColorBasedOnType();
     

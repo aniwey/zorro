@@ -2,7 +2,7 @@
 
 #include "Fruit.hpp"
 
-Fruit::Fruit(Land& l, int x, int y): Entity(l.frame_id, x, y){
+Fruit::Fruit(Land& l, int x, int y): Entity(x, y){
   // Get color of the pixel that's under us
   leavesColorUnderUs = l.p[pixelX][pixelY].color;
   
@@ -28,8 +28,6 @@ Fruit::~Fruit(){
 }
 
 bool Fruit::loop(Land& l){
-  last_frame_id = l.frame_id;
-  
   // If the pixel where the fruit is just felt
   if(l.p[pixelX][pixelY].feltAtThisFrame == l.frame_id){
     // If we were landing and we could begin dying, then we're not ladning anymore
